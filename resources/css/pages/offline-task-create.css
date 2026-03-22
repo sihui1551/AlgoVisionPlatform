@@ -1,0 +1,267 @@
+.page-offline-task-create .content-grid {
+  align-content: start;
+}
+
+.page-offline-task-create .panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.offline-task-create-page {
+  border-radius: 14px;
+}
+
+.offline-task-create-form {
+  display: grid;
+  gap: 18px;
+  padding: 18px 20px 0;
+}
+
+.offline-form-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.offline-form-label {
+  padding-top: 10px;
+  color: #23384d;
+  font-size: 14px;
+}
+
+.offline-form-value {
+  min-width: 0;
+}
+
+.offline-name-input {
+  width: min(240px, 100%);
+}
+
+.offline-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #334b63;
+  cursor: pointer;
+}
+
+.offline-radio-dot {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #bccad9;
+  border-radius: 50%;
+  position: relative;
+}
+
+.offline-radio.active {
+  color: #176bff;
+}
+
+.offline-radio.active .offline-radio-dot {
+  border-color: #176bff;
+}
+
+.offline-radio.active .offline-radio-dot::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: #176bff;
+}
+
+.offline-selection-group {
+  display: grid;
+  gap: 10px;
+}
+
+.offline-selection-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.offline-inline-link {
+  font-size: 13px;
+}
+
+.offline-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.offline-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid #8db5ff;
+  border-radius: 4px;
+  background: #f3f8ff;
+  color: #2860d2;
+  font-size: 12px;
+}
+
+.offline-chip-close {
+  margin-left: 8px;
+  color: #6281b0;
+}
+
+.offline-stage {
+  margin: 20px 14px 0;
+  border: 1px solid #dde8f3;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.offline-stage-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 16px 10px;
+}
+
+.offline-stage-title {
+  margin: 0;
+  color: #21384e;
+  font-size: 16px;
+}
+
+.offline-stage-hint {
+  margin: 4px 0 0;
+  color: #7a8da5;
+  font-size: 12px;
+}
+
+.offline-dropzone {
+  margin: 0 16px;
+  padding: 16px;
+  border: 1px dashed #cfe0f3;
+  border-radius: 8px;
+  background: #fcfdff;
+}
+
+.offline-dropzone-title {
+  color: #27405c;
+  font-weight: 700;
+}
+
+.offline-dropzone-text {
+  margin-top: 8px;
+  color: #7d90a7;
+  font-size: 12px;
+}
+
+.offline-algorithm-tabs {
+  display: flex;
+  gap: 24px;
+  padding: 14px 16px 0;
+}
+
+.offline-algorithm-tab {
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #4f6279;
+  cursor: pointer;
+}
+
+.offline-algorithm-tab.active {
+  color: #176bff;
+  border-bottom-color: #176bff;
+  font-weight: 700;
+}
+
+.offline-tab-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 16px 16px;
+  border-bottom: 1px solid #ecf1f7;
+}
+
+.offline-meta-pair {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.offline-meta-label {
+  color: #2d4258;
+  font-weight: 600;
+}
+
+.offline-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border: 1px solid #d8e3f0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.offline-meta-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.offline-interval-input {
+  width: 56px;
+  min-width: 56px;
+  height: 32px;
+  padding: 0 10px;
+}
+
+.offline-meta-unit {
+  color: #5f738a;
+}
+
+.offline-material-table-wrap {
+  padding: 0 16px 16px;
+}
+
+.offline-material-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0 10px;
+}
+
+.offline-material-table-title {
+  margin: 0;
+  color: #22394e;
+  font-size: 16px;
+}
+
+.offline-material-table-note {
+  color: #6f839a;
+  font-size: 12px;
+}
+
+.offline-material-table table {
+  min-width: 1100px;
+}
+
+.offline-empty-state {
+  min-height: 92px;
+  display: grid;
+  place-items: center;
+}
+
+.offline-task-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px 0 22px;
+}

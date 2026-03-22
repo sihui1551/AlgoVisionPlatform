@@ -1,0 +1,12 @@
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Source Sans Pro", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+a { color: inherit; text-decoration: none; }
+button, input, select { font: inherit; }
