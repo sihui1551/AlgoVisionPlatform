@@ -1,0 +1,177 @@
+﻿.page-cloud-record .content-grid {
+  align-content: start;
+}
+
+.page-cloud-record .panel {
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid #232323;
+  background: #000;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.page-cloud-record .cloud-record-page {
+  min-height: 720px;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+
+.page-cloud-record .cloud-record-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 580px;
+  background: #000;
+}
+
+.page-cloud-record .cloud-record-top-meta {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.page-cloud-record .cloud-record-status {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.page-cloud-record .cloud-record-center-hint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  user-select: none;
+}
+
+.page-cloud-record .cloud-record-info-bar {
+  height: 34px;
+  padding: 0 12px;
+  border-top: 1px solid #2f2f2f;
+  border-bottom: 1px solid #2f2f2f;
+  background: linear-gradient(180deg, #2f3742 0%, #20262e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-cloud-record .cloud-record-bitrate {
+  color: #c9d8ea;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.page-cloud-record .cloud-record-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-cloud-record .cloud-record-icon {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #d8e6f7;
+  font-size: 13px;
+  line-height: 22px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.page-cloud-record .cloud-record-icon:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.page-cloud-record .cloud-record-timeline {
+  height: 16px;
+  border-top: 1px solid #0f1114;
+  border-bottom: 1px solid #3a3d42;
+  background: #1a1d22;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.page-cloud-record .cloud-record-control-bar {
+  height: 44px;
+  background: #2b2f34;
+  border-top: 1px solid #3b4047;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.page-cloud-record .cloud-record-btn {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #f0f3f8;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.page-cloud-record .cloud-record-btn.primary {
+  background: #3d4653;
+}
+
+.page-cloud-record .cloud-record-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.page-cloud-record .cloud-record-speed {
+  margin-left: 8px;
+  color: #f7e3b0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.page-cloud-record .cloud-record-source {
+  height: 34px;
+  padding: 0 12px;
+  background: #14171b;
+  border-top: 1px solid #2f3338;
+  color: #a7b4c5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page-cloud-record .cloud-record-source span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 900px) {
+  .page-cloud-record .cloud-record-page {
+    min-height: 560px;
+  }
+
+  .page-cloud-record .cloud-record-stage {
+    min-height: 420px;
+  }
+
+  .page-cloud-record .cloud-record-top-meta {
+    font-size: 12px;
+  }
+}

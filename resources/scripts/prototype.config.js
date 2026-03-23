@@ -1,4 +1,4 @@
-window.PROTOTYPE_CONFIG = {
+﻿window.PROTOTYPE_CONFIG = {
   "app": {
     "eyebrow": "演示框架",
     "brandMark": "AI",
@@ -15,10 +15,10 @@ window.PROTOTYPE_CONFIG = {
     "driver": "localStorage",
     "namespace": "axure-prototype",
     "project": "ai-video-scheduling-platform",
-    "version": "2026-03-22-stream-toolbar-v4",
+    "version": "2026-03-23-local-video-fix-v1",
     "seedOnFirstLoad": true
   },
-  "defaultPage": "stream-analysis",
+  "defaultPage": "dashboard",
   "navigation": [
     {
       "key": "home-group",
@@ -39,6 +39,14 @@ window.PROTOTYPE_CONFIG = {
         {
           "key": "gb-device",
           "label": "国标设备"
+        },
+        {
+          "key": "stream-proxy",
+          "label": "拉流代理"
+        },
+        {
+          "key": "local-video",
+          "label": "本地视频"
         }
       ]
     },
@@ -100,10 +108,65 @@ window.PROTOTYPE_CONFIG = {
     }
   ],
   "pageRegistry": {
+    "dashboard": {
+      "key": "dashboard",
+      "file": "仪表盘.html",
+      "source": "resources/scripts/pages/dashboard.page.js"
+    },
     "stream-analysis": {
       "key": "stream-analysis",
       "file": "视频流分析.html",
       "source": "resources/scripts/pages/stream-analysis.page.js"
+    },
+    "gb-device": {
+      "key": "gb-device",
+      "file": "国标设备.html",
+      "source": "resources/scripts/pages/gb-device.page.js"
+    },
+    "stream-proxy": {
+      "key": "stream-proxy",
+      "file": "拉流代理.html",
+      "source": "resources/scripts/pages/stream-proxy.page.js"
+    },
+    "local-video": {
+      "key": "local-video",
+      "file": "本地视频.html",
+      "source": "resources/scripts/pages/local-video.page.js"
+    },
+    "cloud-record": {
+      "key": "cloud-record",
+      "file": "云端录像.html",
+      "source": "resources/scripts/pages/cloud-record.page.js"
+    },
+    "stream-proxy-create": {
+      "key": "stream-proxy-create",
+      "file": "新增代理拉流.html",
+      "source": "resources/scripts/pages/stream-proxy-edit.page.js"
+    },
+    "stream-proxy-edit": {
+      "key": "stream-proxy-edit",
+      "file": "编辑拉流代理信息.html",
+      "source": "resources/scripts/pages/stream-proxy-edit.page.js"
+    },
+    "gb-device-create": {
+      "key": "gb-device-create",
+      "file": "新增设备.html",
+      "source": "resources/scripts/pages/gb-device-form.page.js"
+    },
+    "gb-device-edit": {
+      "key": "gb-device-edit",
+      "file": "设备编辑.html",
+      "source": "resources/scripts/pages/gb-device-form.page.js"
+    },
+    "gb-channel-list": {
+      "key": "gb-channel-list",
+      "file": "通道列表.html",
+      "source": "resources/scripts/pages/gb-channel-list.page.js"
+    },
+    "gb-channel-edit": {
+      "key": "gb-channel-edit",
+      "file": "编辑通道.html",
+      "source": "resources/scripts/pages/gb-channel-form.page.js"
     },
     "stream-task-create": {
       "key": "stream-task-create",
@@ -122,3 +185,4 @@ window.PROTOTYPE_CONFIG = {
     }
   }
 };
+

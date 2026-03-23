@@ -1,0 +1,382 @@
+﻿.page-stream-proxy-edit .content-grid {
+  align-content: start;
+}
+
+.page-stream-proxy-edit .panel {
+  padding: 0;
+  border-radius: 14px;
+  border-color: #e2eaf4;
+  background: #ffffff;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-page {
+  min-height: 780px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px 10px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #2f4157;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-back-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-divider {
+  width: 1px;
+  height: 20px;
+  background: #e5ebf4;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-title {
+  margin: 0;
+  color: #2a3748;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-tabs {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 0 24px;
+  border-bottom: 1px solid #e6edf7;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-tab {
+  position: relative;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #5f6f80;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-tab.active {
+  color: #4fa2f7;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #79bcff;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-panels {
+  padding: 18px 24px 14px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-panel {
+  display: none;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-panel.active {
+  display: block;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-proxy-form {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-proxy-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-proxy-label {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  color: #5b6c82;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-required {
+  color: #f08e88;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-proxy-value {
+  min-width: 0;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-control {
+  width: 100%;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #dfe6ef;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #5a6777;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-control::placeholder {
+  color: #c2cad4;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-control:focus {
+  border-color: #b9d2f5;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #d0d6df 50%), linear-gradient(135deg, #d0d6df 50%, transparent 50%);
+  background-position: calc(100% - 22px) calc(50% - 3px), calc(100% - 16px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-radio-group {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-radio-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #667587;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-radio-item input {
+  accent-color: #2d83f5;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-check-group {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-check-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #667587;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-check-item input {
+  width: 15px;
+  height: 15px;
+  accent-color: #2d83f5;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-channel-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 34px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-channel-column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-channel-row {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-channel-row.is-checkbox {
+  align-items: start;
+  padding-top: 8px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-channel-label {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  color: #55657a;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-channel-value {
+  min-width: 0;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-input-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 70px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-input-action .stream-proxy-edit-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-inline-button {
+  height: 40px;
+  border: 1px solid #dfe6ef;
+  border-left: 0;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  background: #f7fafc;
+  color: #7c8b9e;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-inline-button:hover {
+  background: #f2f7fc;
+  color: #4f6179;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-date {
+  position: relative;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-date-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c4ccd6;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-date-input {
+  padding-left: 34px;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-single-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  color: #5f6d7d;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-single-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2d83f5;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 24px 24px;
+  border-top: 1px solid #edf2f8;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-save,
+.page-stream-proxy-edit .stream-proxy-edit-cancel {
+  min-width: 88px;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-save {
+  background: #2d83f5;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-save:hover {
+  background: #225fdf;
+}
+
+.page-stream-proxy-edit .stream-proxy-edit-cancel {
+  border-color: #dfe6ef;
+  color: #5f6b7b;
+  background: #ffffff;
+}
+
+@media (max-width: 1320px) {
+  .page-stream-proxy-edit .stream-proxy-edit-channel-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .page-stream-proxy-edit .stream-proxy-edit-topbar,
+  .page-stream-proxy-edit .stream-proxy-edit-tabs,
+  .page-stream-proxy-edit .stream-proxy-edit-panels,
+  .page-stream-proxy-edit .stream-proxy-edit-actions {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .page-stream-proxy-edit .stream-proxy-edit-proxy-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    align-items: start;
+  }
+
+  .page-stream-proxy-edit .stream-proxy-edit-proxy-label {
+    justify-content: flex-start;
+  }
+
+  .page-stream-proxy-edit .stream-proxy-edit-channel-columns {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .page-stream-proxy-edit .stream-proxy-edit-channel-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    align-items: start;
+  }
+
+  .page-stream-proxy-edit .stream-proxy-edit-channel-label {
+    justify-content: flex-start;
+    min-height: auto;
+  }
+}

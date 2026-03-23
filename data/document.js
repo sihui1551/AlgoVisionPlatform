@@ -17,10 +17,46 @@
   "sitemap": {
     "rootNodes": [
       {
+        "id": "92b1a0",
+        "pageName": "仪表盘",
+        "type": "Wireframe",
+        "url": "仪表盘.html"
+      },
+      {
         "id": "391170",
         "pageName": "视频流分析",
         "type": "Wireframe",
         "url": "视频流分析.html"
+      },
+      {
+        "id": "b824e1",
+        "pageName": "国标设备",
+        "type": "Wireframe",
+        "url": "国标设备.html"
+      },
+      {
+        "id": "af3d21",
+        "pageName": "新增设备",
+        "type": "Wireframe",
+        "url": "新增设备.html"
+      },
+      {
+        "id": "de51a8",
+        "pageName": "设备编辑",
+        "type": "Wireframe",
+        "url": "设备编辑.html"
+      },
+      {
+        "id": "bf7d92",
+        "pageName": "通道列表",
+        "type": "Wireframe",
+        "url": "通道列表.html"
+      },
+      {
+        "id": "c1452d",
+        "pageName": "编辑通道",
+        "type": "Wireframe",
+        "url": "编辑通道.html"
       },
       {
         "id": "a75607",
@@ -33,6 +69,36 @@
         "pageName": "离线视图分析",
         "type": "Wireframe",
         "url": "离线视图分析.html"
+      },
+      {
+        "id": "f38a21",
+        "pageName": "拉流代理",
+        "type": "Wireframe",
+        "url": "拉流代理.html"
+      },
+      {
+        "id": "9ab1f3",
+        "pageName": "本地视频",
+        "type": "Wireframe",
+        "url": "本地视频.html"
+      },
+      {
+        "id": "8d2c71",
+        "pageName": "云端录像",
+        "type": "Wireframe",
+        "url": "云端录像.html"
+      },
+      {
+        "id": "cde618",
+        "pageName": "新增代理拉流",
+        "type": "Wireframe",
+        "url": "新增代理拉流.html"
+      },
+      {
+        "id": "d781c4",
+        "pageName": "编辑拉流代理信息",
+        "type": "Wireframe",
+        "url": "编辑拉流代理信息.html"
       }
     ]
   },
@@ -333,3 +399,4 @@
   }
 }
 );
+

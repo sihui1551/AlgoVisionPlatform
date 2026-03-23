@@ -9,6 +9,15 @@
   };
 
   function renderDashboardPage(context, page) {
+    if (page && typeof page.renderDashboardPage === "function") {
+      return page.renderDashboardPage({
+        context: context,
+        page: page,
+        shell: shell,
+        utils: utils
+      });
+    }
+
     if (page.dashboardVariant === "offline-task-create") {
       return renderOfflineTaskCreatePage(page);
     }

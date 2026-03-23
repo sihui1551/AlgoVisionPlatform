@@ -8,6 +8,10 @@
   };
 
   function bindTablePage(page) {
+    if (page && typeof page.renderTablePanel === "function") {
+      return;
+    }
+
     if (page.streamTaskPage || page.offlineTaskPage) {
       bindSourceTaskPage(page);
       return;
@@ -17,6 +21,16 @@
   }
 
   function renderTablePage(page) {
+    if (page && typeof page.renderTablePanel === "function") {
+      return page.renderTablePanel({
+        page: page,
+        shell: shell,
+        utils: utils,
+        renderTableFooter: renderTableFooter,
+        renderRowAction: renderRowAction
+      });
+    }
+
     if (page.streamTaskPage || page.offlineTaskPage) {
       return renderSourceTaskTable(page);
     }
