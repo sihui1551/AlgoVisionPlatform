@@ -282,13 +282,22 @@
         '</div><div class="toolbar-group access-source-actions"><button id="access-source-add" class="button access-source-add" type="button" data-access-action="open-create">+ 新增接入源</button><button id="access-source-refresh" class="access-source-refresh" type="button" aria-label="刷新">↻</button></div></div>' +
         '<div class="table-shell access-source-table-shell"><table><thead><tr id="access-source-table-head"></tr></thead><tbody id="access-source-table-body"></tbody></table></div>' +
         '<div class="table-footer access-source-footer"><div class="table-footer-count hint-text" id="access-source-count"></div></div>' +
-        infoModalHtml() + createModalHtml() + "</section>";
+        infoModalHtml() + createModalHtml() + renderPlayerModal() + "</section>";
     },
     setup: function (rt) {
       const u = window.PROTOTYPE_UTILS;
       const p = rt.page;
       const n = ids();
-      const s = { type: ALL, infoId: "", createOpen: false, createTypeSwitch: false, draft: makeDraft("gb_device") };
+      const s = {
+        type: ALL,
+        infoId: "",
+        createOpen: false,
+        createTypeSwitch: false,
+        draft: makeDraft("gb_device"),
+        activePlayerRow: null,
+        activePlayerTech: "jessibuca",
+        activePlayerTab: "live"
+      };
 
       function rows() {
         return Array.isArray(p.accessSourcePage.rows) ? p.accessSourcePage.rows : [];
@@ -369,6 +378,76 @@
         rt.showToast("新增成功", "已新增接入源 " + row.name + "。");
       }
 
+      function openPlayerModal(row) {
+        s.activePlayerRow = row || null;
+        s.activePlayerTech = "jessibuca";
+        s.activePlayerTab = "live";
+        syncPlayerModal();
+        if (n.playerModal) {
+          n.playerModal.classList.add("visible");
+        }
+        if (n.playerBackdrop) {
+          n.playerBackdrop.classList.add("visible");
+        }
+        document.body.classList.add("access-source-player-open");
+      }
+
+      function closePlayerModal() {
+        s.activePlayerRow = null;
+        if (n.playerModal) {
+          n.playerModal.classList.remove("visible");
+        }
+        if (n.playerBackdrop) {
+          n.playerBackdrop.classList.remove("visible");
+        }
+        document.body.classList.remove("access-source-player-open");
+      }
+
+      function syncPlayerModal() {
+        if (!n.playerModal) {
+          return;
+        }
+
+        const playerNameNode = n.playerModal.querySelector("[data-access-player-name]");
+        const streamAddressNode = n.playerModal.querySelector("[data-access-player-stream-address]");
+        const iframeAddressNode = n.playerModal.querySelector("[data-access-player-iframe-address]");
+        const resourceAddressNode = n.playerModal.querySelector("[data-access-player-resource-address]");
+        const techNodes = n.playerModal.querySelectorAll("[data-access-player-tech]");
+        const tabNodes = n.playerModal.querySelectorAll("[data-access-player-tab]");
+        const infoPanels = n.playerModal.querySelectorAll("[data-access-player-info-panel]");
+        const row = s.activePlayerRow || {};
+        const code = row.gbCode || row.streamId || "44130300001320000017";
+        const streamAddress = "http://192.168.224.115:9528/#/play/wasm/ws%3A%2F%2F192.168.224.78%3A8081%2Frtp%2F" + code;
+        const iframeAddress = '<iframe src="' + streamAddress + '" allowfullscreen></iframe>';
+        const resourceAddress = "ws://192.168.224.78:8081/rtp/" + code + "_" + code;
+
+        if (playerNameNode) {
+          playerNameNode.textContent = row.appName || row.name || "Camera 01";
+        }
+        if (streamAddressNode) {
+          streamAddressNode.value = streamAddress;
+        }
+        if (iframeAddressNode) {
+          iframeAddressNode.value = iframeAddress;
+        }
+        if (resourceAddressNode) {
+          resourceAddressNode.value = resourceAddress;
+        }
+
+        techNodes.forEach(function (node) {
+          const tech = node.getAttribute("data-access-player-tech") || "";
+          node.classList.toggle("active", tech === s.activePlayerTech);
+        });
+        tabNodes.forEach(function (node) {
+          const tab = node.getAttribute("data-access-player-tab") || "";
+          node.classList.toggle("active", tab === s.activePlayerTab);
+        });
+        infoPanels.forEach(function (node) {
+          const panel = node.getAttribute("data-access-player-info-panel") || "";
+          node.classList.toggle("active", panel === s.activePlayerTab);
+        });
+      }
+
       function onClick(e) {
         const tab = e.target.closest("[data-access-type]");
         if (tab) {
@@ -420,7 +499,7 @@
           }
 
           if (action === "play" && row) {
-            rt.showToast("播放", "当前原型预留 " + row.name + " 的播放能力。");
+            openPlayerModal(row);
             return;
           }
 
@@ -436,6 +515,24 @@
 
         if (e.target.closest("#access-source-create-backdrop")) {
           closeCreate();
+        }
+
+        if (e.target.closest("[data-access-player-close]") || e.target.closest("#access-source-player-backdrop")) {
+          closePlayerModal();
+          return;
+        }
+
+        const techTrigger = e.target.closest("[data-access-player-tech]");
+        if (techTrigger) {
+          s.activePlayerTech = techTrigger.getAttribute("data-access-player-tech") || "jessibuca";
+          syncPlayerModal();
+          return;
+        }
+
+        const tabTrigger = e.target.closest("[data-access-player-tab]");
+        if (tabTrigger) {
+          s.activePlayerTab = tabTrigger.getAttribute("data-access-player-tab") || "live";
+          syncPlayerModal();
         }
       }
 
@@ -508,6 +605,11 @@
 
         if (s.infoId) {
           closeInfo();
+          return;
+        }
+
+        if (s.activePlayerRow) {
+          closePlayerModal();
         }
       }
 
@@ -536,6 +638,7 @@
       render();
 
       return function () {
+        closePlayerModal();
         rt.mountNode.removeEventListener("click", onClick);
         rt.mountNode.removeEventListener("input", onDraft);
         rt.mountNode.removeEventListener("change", onDraft);
@@ -565,7 +668,9 @@
       createBg: g("access-source-create-backdrop"),
       createTitle: g("access-source-create-title"),
       createForm: g("access-source-create-form"),
-      createSubmit: g("access-source-create-submit")
+      createSubmit: g("access-source-create-submit"),
+      playerModal: g("access-source-player-modal"),
+      playerBackdrop: g("access-source-player-backdrop")
     };
   }
 
@@ -900,6 +1005,137 @@
 
   function createModalHtml() {
     return '<div id="access-source-create-backdrop" class="access-source-modal-backdrop"></div><section id="access-source-create-modal" class="access-source-modal access-source-create-modal" aria-hidden="true"><div class="access-source-modal-header"><h3 id="access-source-create-title" class="access-source-modal-title">新增接入源</h3><button class="access-source-modal-close" type="button" data-access-action="close-create" aria-label="关闭">×</button></div><div class="access-source-modal-body access-source-create-body"><div id="access-source-create-form" class="access-source-create-form"></div></div><div class="access-source-create-footer"><button id="access-source-create-submit" class="button" type="button" data-access-action="submit-create">保存</button><button class="button-secondary" type="button" data-access-action="close-create">取消</button></div></section>';
+  }
+
+  function renderPlayerModal() {
+    return (
+      '<div id="access-source-player-backdrop" class="gb-channel-player-backdrop"></div>' +
+      '<section id="access-source-player-modal" class="gb-channel-player-modal" aria-hidden="true">' +
+      '<div class="gb-channel-player-header">' +
+      '<h3 class="gb-channel-player-title">视频播放</h3>' +
+      '<button class="gb-channel-player-close" type="button" data-access-player-close="true" aria-label="关闭">×</button>' +
+      "</div>" +
+      '<div class="gb-channel-player-tech-tabs">' +
+      renderPlayerTechTab("jessibuca", "Jessibuca", true) +
+      renderPlayerTechTab("webrtc", "WebRTC", false) +
+      renderPlayerTechTab("h265web", "h265web", false) +
+      "</div>" +
+      '<div class="gb-channel-player-stage">' +
+      '<div class="gb-channel-player-screen">' +
+      '<span class="gb-channel-player-time">2026年03月22日 星期日 22:10:50</span>' +
+      '<span class="gb-channel-player-name" data-access-player-name>Camera 01</span>' +
+      '<div class="gb-channel-player-controls">' +
+      '<div class="gb-channel-player-control-left"><span>▮▮</span><span>■</span><span>🔊</span></div>' +
+      '<div class="gb-channel-player-control-right"><span>305 kb/s</span><span>◉</span><span>↻</span><span>↗</span></div>' +
+      "</div>" +
+      "</div>" +
+      "</div>" +
+      '<div class="gb-channel-player-info-tabs">' +
+      renderPlayerInfoTab("live", "实时视频", true) +
+      renderPlayerInfoTab("codec", "编码信息", false) +
+      "</div>" +
+      '<div class="gb-channel-player-info-panel active" data-access-player-info-panel="live">' +
+      renderPlayerInfoRow("播放地址", "http://192.168.224.115:9528/#/play/wasm/ws%3A%2F%2F192.168.224.78%3A8081%2Frtp%2F44130300001320000017", "access-player-stream-address") +
+      renderPlayerInfoRow("iframe", '<iframe src="http://192.168.224.115:9528/#/play/wasm/ws%3A%2F%2F192.168.224.78%3A8081%2Frtp%2F44130300001320000017"></iframe>', "access-player-iframe-address") +
+      renderPlayerResourceRow() +
+      "</div>" +
+      '<div class="gb-channel-player-info-panel" data-access-player-info-panel="codec">' + renderCodecInfoPanel() + "</div>" +
+      "</section>"
+    );
+  }
+
+  function renderCodecInfoPanel() {
+    return (
+      '<section class="gb-channel-codec-panel">' +
+      '<div class="gb-channel-codec-head">' +
+      '<h4 class="gb-channel-codec-title">概况</h4>' +
+      '<button class="gb-channel-codec-refresh" type="button" data-toast-title="刷新编码信息" data-toast-message="当前原型已刷新编码信息。">↻</button>' +
+      "</div>" +
+      '<div class="gb-channel-codec-overview">' +
+      renderCodecMetric("观看人数", "5") +
+      renderCodecMetric("网络", "11.43 KB/S") +
+      renderCodecMetric("持续时间", "30秒") +
+      "</div>" +
+      '<div class="gb-channel-codec-grid">' +
+      '<section class="gb-channel-codec-block">' +
+      '<h5 class="gb-channel-codec-block-title">视频信息</h5>' +
+      '<div class="gb-channel-codec-kv-grid">' +
+      renderCodecField("编码", "H264") +
+      renderCodecField("分辨率", "2560x1440") +
+      renderCodecField("FPS", "25") +
+      renderCodecField("丢包率", "0") +
+      "</div>" +
+      "</section>" +
+      '<section class="gb-channel-codec-block">' +
+      '<h5 class="gb-channel-codec-block-title">音频信息</h5>' +
+      '<div class="gb-channel-codec-kv-grid">' +
+      renderCodecField("编码", "G711A") +
+      renderCodecField("采样率", "8000") +
+      "</div>" +
+      "</section>" +
+      "</div>" +
+      "</section>"
+    );
+  }
+
+  function renderCodecMetric(label, value) {
+    const u = window.PROTOTYPE_UTILS;
+    return (
+      '<div class="gb-channel-codec-metric">' +
+      '<span class="gb-channel-codec-metric-label">' + u.escapeHtml(label) + "</span>" +
+      '<span class="gb-channel-codec-metric-value">' + u.escapeHtml(value) + "</span>" +
+      "</div>"
+    );
+  }
+
+  function renderCodecField(label, value) {
+    const u = window.PROTOTYPE_UTILS;
+    return (
+      '<div class="gb-channel-codec-field">' +
+      '<span class="gb-channel-codec-field-label">' + u.escapeHtml(label) + "</span>" +
+      '<span class="gb-channel-codec-field-value">' + u.escapeHtml(value) + "</span>" +
+      "</div>"
+    );
+  }
+
+  function renderPlayerTechTab(key, label, active) {
+    const u = window.PROTOTYPE_UTILS;
+    return (
+      '<button class="gb-channel-player-tech-tab' + (active ? " active" : "") + '" type="button" data-access-player-tech="' + u.escapeAttribute(key) + '">' +
+      u.escapeHtml(label) +
+      "</button>"
+    );
+  }
+
+  function renderPlayerInfoTab(key, label, active) {
+    const u = window.PROTOTYPE_UTILS;
+    return (
+      '<button class="gb-channel-player-info-tab' + (active ? " active" : "") + '" type="button" data-access-player-tab="' + u.escapeAttribute(key) + '">' +
+      u.escapeHtml(label) +
+      "</button>"
+    );
+  }
+
+  function renderPlayerInfoRow(label, value, inputKey) {
+    const u = window.PROTOTYPE_UTILS;
+    return (
+      '<label class="gb-channel-player-info-row">' +
+      '<span class="gb-channel-player-info-label">' + u.escapeHtml(label) + ":</span>" +
+      '<input class="gb-channel-player-info-input" data-' + u.escapeAttribute(inputKey) + ' readonly value="' + u.escapeAttribute(value) + '" />' +
+      '<button class="gb-channel-player-copy" type="button" data-toast-title="复制" data-toast-message="当前原型仅演示复制入口。">⧉</button>' +
+      "</label>"
+    );
+  }
+
+  function renderPlayerResourceRow() {
+    return (
+      '<label class="gb-channel-player-info-row">' +
+      '<span class="gb-channel-player-info-label">资源地址:</span>' +
+      '<button class="gb-channel-player-resource-more" type="button" data-toast-title="更多地址" data-toast-message="当前原型保留更多地址入口。">更多地址 ∨</button>' +
+      '<input class="gb-channel-player-info-input gb-channel-player-resource-input" data-access-player-resource-address readonly value="ws://192.168.224.78:8081/rtp/44130300001320000017_44130300001320000017" />' +
+      '<button class="gb-channel-player-copy" type="button" data-toast-title="复制" data-toast-message="当前原型仅演示复制入口。">⧉</button>' +
+      "</label>"
+    );
   }
 
   function syncCreate(n, d, allowTypeSwitch) {
