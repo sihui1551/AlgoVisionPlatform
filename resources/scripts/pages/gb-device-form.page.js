@@ -91,7 +91,7 @@
       '<section class="panel gb-device-form-page">' +
       '<div class="gb-device-form-header">' +
       '<h2 class="gb-device-form-title">' + utils.escapeHtml(formPage.panelTitle || page.heading || "") + "</h2>" +
-      '<button class="gb-device-form-close" type="button" data-route="gb-device" aria-label="关闭">×</button>' +
+      '<button class="gb-device-form-close" type="button" data-route="access-source" aria-label="关闭">×</button>' +
       "</div>" +
       '<div class="gb-device-form-body">' +
       renderFormRow("设备编号", renderInput("deviceId", defaults.deviceId, "请输入设备编号"), true) +
@@ -105,7 +105,7 @@
       "</div>" +
       '<div class="gb-device-form-actions">' +
       '<button id="gb-device-form-submit" class="button gb-device-form-submit" type="button">确认</button>' +
-      '<button class="button-secondary gb-device-form-cancel" type="button" data-route="gb-device">取消</button>' +
+      '<button class="button-secondary gb-device-form-cancel" type="button" data-route="access-source">取消</button>' +
       "</div>" +
       "</section>"
     );
@@ -131,7 +131,7 @@
 
       window.setTimeout(function () {
         if (typeof navigateToRoute === "function") {
-          navigateToRoute("gb-device");
+          navigateToRoute("access-source");
         }
       }, 240);
     }

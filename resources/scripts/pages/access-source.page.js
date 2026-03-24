@@ -48,6 +48,12 @@
     { value: "gcj02", label: "GCJ-02" }
   ];
 
+  const GB_TRANSPORT_MODE_OPTIONS = [
+    { value: "udp", label: "UDP" },
+    { value: "tcp_active", label: "TCP主动模式" },
+    { value: "tcp_passive", label: "TCP被动模式" }
+  ];
+
   const STREAM_TYPE_OPTIONS = [
     { value: "default", label: "默认" },
     { value: "on-demand", label: "按需" }
@@ -214,6 +220,7 @@
 
   const ALL_COLUMNS = [
     { key: "name", label: "名称" },
+    { key: "sourceTypeLabel", label: "设备类型" },
     { key: "sourceCode", label: "来源标识" },
     { key: "endpoint", label: "接入地址" },
     { key: "runtimeStatus", label: "运行状态" },
@@ -414,6 +421,11 @@
             rt.showToast("播放", "当前原型预留 " + row.name + " 的播放能力。");
             return;
           }
+
+          if (action === "refresh-row" && row) {
+            rt.showToast("刷新成功", "已刷新 " + row.name + "。");
+            return;
+          }
         }
 
         if (e.target.closest("#access-source-access-backdrop") || e.target.closest("[data-access-modal-close]")) {
@@ -465,6 +477,23 @@
         s.draft[key] = String(node.value || "").trim();
       }
 
+      function onTableChange(e) {
+        const modeNode = e.target.closest("[data-access-transport-row]");
+        if (!modeNode) {
+          return;
+        }
+
+        const rowId = modeNode.getAttribute("data-access-transport-row") || "";
+        const nextValue = String(modeNode.value || "");
+        const row = rows().find(function (x) { return x.id === rowId; });
+        if (!row) {
+          return;
+        }
+
+        row.transportMode = transportModeLabel(nextValue);
+        persist();
+      }
+
       function onEsc(e) {
         if (e.key !== "Escape") {
           return;
@@ -503,6 +532,7 @@
       rt.mountNode.addEventListener("click", onClick);
       rt.mountNode.addEventListener("input", onDraft);
       rt.mountNode.addEventListener("change", onDraft);
+      rt.mountNode.addEventListener("change", onTableChange);
       window.addEventListener("keydown", onEsc);
 
       n.type.value = ALL;
@@ -513,6 +543,7 @@
         rt.mountNode.removeEventListener("click", onClick);
         rt.mountNode.removeEventListener("input", onDraft);
         rt.mountNode.removeEventListener("change", onDraft);
+        rt.mountNode.removeEventListener("change", onTableChange);
         window.removeEventListener("keydown", onEsc);
       };
     }
@@ -628,6 +659,9 @@
       if (c.key === "enabled") {
         return '<td><span class="status-pill ' + u.escapeAttribute(r.enabled || "") + '">' + u.escapeHtml(r.enabledLabel || "--") + "</span></td>";
       }
+      if (c.key === "transportMode" && rowType(r) === "gb_device") {
+        return "<td>" + transportModeSelectHtml(r, u) + "</td>";
+      }
       if (c.key === "subscribe") {
         return "<td>" + subscribeHtml(r) + "</td>";
       }
@@ -676,10 +710,40 @@
 
   function actions(r, u) {
     if (rowType(r) === "gb_device") {
-      return '<button class="table-action access-source-action-link" type="button" data-route="gb-device-edit">编辑</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="gb-channel-list">通道</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-access-action="access-info" data-access-id="' + u.escapeAttribute(r.id) + '">接入信息</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-access-action="delete-row" data-access-id="' + u.escapeAttribute(r.id) + '">删除</button>';
+      return '<button class="table-action access-source-action-link" type="button" data-access-action="refresh-row" data-access-id="' + u.escapeAttribute(r.id) + '">刷新</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="gb-channel-list">通道</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="gb-device-edit">编辑</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-access-action="delete-row" data-access-id="' + u.escapeAttribute(r.id) + '">删除</button>';
     }
 
     return '<button class="table-action access-source-action-link" type="button" data-access-action="play" data-access-id="' + u.escapeAttribute(r.id) + '">播放</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="stream-proxy-edit" data-access-action="proxy-edit" data-access-id="' + u.escapeAttribute(r.id) + '">编辑</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="cloud-record">云端录像</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-access-action="delete-row" data-access-id="' + u.escapeAttribute(r.id) + '">删除</button>';
+  }
+
+  function transportModeSelectHtml(row, u) {
+    const current = transportModeValue(row.transportMode);
+    const opts = GB_TRANSPORT_MODE_OPTIONS.map(function (item) {
+      const selected = item.value === current ? ' selected="selected"' : "";
+      return '<option value="' + u.escapeAttribute(item.value) + '"' + selected + ">" + u.escapeHtml(item.label) + "</option>";
+    }).join("");
+    return '<select class="access-source-transport-select" data-access-transport-row="' + u.escapeAttribute(row.id) + '">' + opts + "</select>";
+  }
+
+  function transportModeValue(label) {
+    const text = sanitize(label).toLowerCase();
+    if (text === "udp") {
+      return "udp";
+    }
+    if (text === "tcp主动模式" || text === "tcpactive" || text === "tcp_active") {
+      return "tcp_active";
+    }
+    return "tcp_passive";
+  }
+
+  function transportModeLabel(value) {
+    if (value === "udp") {
+      return "UDP";
+    }
+    if (value === "tcp_active") {
+      return "TCP主动模式";
+    }
+    return "TCP被动模式";
   }
 
   function rowType(row) {

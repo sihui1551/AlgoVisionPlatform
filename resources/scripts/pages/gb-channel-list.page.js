@@ -4,7 +4,7 @@
       id: "channel-001",
       name: "Camera 01",
       code: "44130300001320000017",
-      channelType: "camera",
+      channelType: "device",
       vendor: "Hikvision",
       locationInfo: "无",
       cameraType: "枪机",
@@ -27,9 +27,9 @@
       rows: CHANNEL_ROWS,
       searchFields: ["name", "code", "vendor"],
       channelTypeOptions: [
-        { value: "", label: "全部" },
-        { value: "camera", label: "摄像头" },
-        { value: "nvr", label: "NVR通道" }
+        { value: "", label: "\u5168\u90E8" },
+        { value: "device", label: "\u8BBE\u5907" },
+        { value: "subdir", label: "\u5B50\u76EE\u5F55" }
       ],
       onlineStatusOptions: [
         { value: "", label: "全部" },
@@ -56,7 +56,7 @@
         '<section class="panel gb-channel-panel">' +
         '<div class="gb-channel-toolbar">' +
         '<div class="gb-channel-toolbar-main">' +
-        '<button class="gb-channel-back" type="button" data-route="gb-device">← 返回</button>' +
+        '<button class="gb-channel-back" type="button" data-route="access-source">← 返回</button>' +
         '<span class="gb-channel-divider"></span>' +
         '<span class="gb-channel-title">通道列表</span>' +
         '<label class="gb-channel-filter">' +
@@ -180,8 +180,6 @@
         floatingMenu.classList.add("visible");
         setFloatingAction("device-record", "设备录像", "当前原型预留查看 " + activeMenuRow.name + " 设备录像的入口。");
         setFloatingAction("cloud-record", "云端录像", "当前原型预留查看 " + activeMenuRow.name + " 云端录像的入口。");
-        setFloatingAction("device-record-start", "设备录像控制-开始", "当前原型模拟开始 " + activeMenuRow.name + " 的设备录像控制。");
-        setFloatingAction("device-record-stop", "设备录像控制-停止", "当前原型模拟停止 " + activeMenuRow.name + " 的设备录像控制。");
       }
 
       function openPlayerModal(row) {
@@ -597,8 +595,6 @@
       '<div id="gb-channel-floating-menu" class="gb-channel-floating-menu">' +
       renderMoreItem("设备录像", "", "", false, "device-record") +
       renderMoreItem("云端录像", "", "", false, "cloud-record") +
-      renderMoreItem("设备录像控制-开始", "", "", false, "device-record-start") +
-      renderMoreItem("设备录像控制-停止", "", "", false, "device-record-stop") +
       "</div>"
     );
   }

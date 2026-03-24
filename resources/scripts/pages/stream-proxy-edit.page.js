@@ -206,7 +206,7 @@
         saveText: meta.saveText,
         saveToastTitle: meta.saveToastTitle,
         saveToastMessage: meta.saveToastMessage,
-        backRoute: "stream-proxy",
+        backRoute: "access-source",
         tabs: meta.mode === "create" ? CREATE_STREAM_PROXY_TABS : EDIT_STREAM_PROXY_TABS,
         proxyInfoDefaults: createProxyInfoDefaults(meta.mode),
         proxyInfoOptions: PROXY_INFO_OPTIONS,
@@ -234,7 +234,7 @@
     return (
       '<section class="panel stream-proxy-edit-page">' +
       '<div class="stream-proxy-edit-topbar">' +
-      '<button class="stream-proxy-edit-back" type="button" data-route="' + utils.escapeAttribute(view.backRoute || "stream-proxy") + '" data-stream-proxy-edit-back="true">' +
+      '<button class="stream-proxy-edit-back" type="button" data-route="' + utils.escapeAttribute(view.backRoute || "access-source") + '" data-stream-proxy-edit-back="true">' +
       '<span class="stream-proxy-edit-back-icon">←</span>返回' +
       "</button>" +
       '<span class="stream-proxy-edit-divider"></span>' +
@@ -255,7 +255,7 @@
       "</div>" +
       '<div class="stream-proxy-edit-actions">' +
       '<button id="stream-proxy-edit-save" class="button stream-proxy-edit-save" type="button">' + utils.escapeHtml(view.saveText || "保存") + "</button>" +
-      '<button class="button-secondary stream-proxy-edit-cancel" type="button" data-route="' + utils.escapeAttribute(view.backRoute || "stream-proxy") + '" data-stream-proxy-edit-cancel="true">取消</button>' +
+      '<button class="button-secondary stream-proxy-edit-cancel" type="button" data-route="' + utils.escapeAttribute(view.backRoute || "access-source") + '" data-stream-proxy-edit-cancel="true">取消</button>' +
       "</div>" +
       "</section>"
     );
@@ -537,13 +537,13 @@
     }
 
     function navigateBackForCreate() {
-      if (window.history.length > 1) {
-        window.history.back();
+      if (typeof navigateToRoute === "function") {
+        navigateToRoute(view.backRoute || "access-source");
         return;
       }
 
-      if (typeof navigateToRoute === "function") {
-        navigateToRoute(view.backRoute || "stream-proxy");
+      if (window.history.length > 1) {
+        window.history.back();
       }
     }
 
@@ -602,7 +602,7 @@
       }
 
       if (typeof navigateToRoute === "function") {
-        navigateToRoute(view.backRoute || "stream-proxy");
+        navigateToRoute(view.backRoute || "access-source");
       }
     }
 

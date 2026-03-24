@@ -37,6 +37,10 @@
       "icon": "目录",
       "children": [
         {
+          "key": "access-source",
+          "label": "接入源管理"
+        },
+        {
           "key": "gb-device",
           "label": "国标设备"
         },
@@ -117,6 +121,11 @@
       "key": "stream-analysis",
       "file": "视频流分析.html",
       "source": "resources/scripts/pages/stream-analysis.page.js"
+    },
+    "access-source": {
+      "key": "access-source",
+      "file": "接入源管理.html",
+      "source": "resources/scripts/pages/access-source.page.js"
     },
     "gb-device": {
       "key": "gb-device",
