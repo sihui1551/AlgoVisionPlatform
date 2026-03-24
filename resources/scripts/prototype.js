@@ -5,6 +5,7 @@
   const loadPrototypePageStyles = window.loadPrototypePageStyles;
   const mockStore = window.PROTOTYPE_MOCK_STORE;
   const components = window.PROTOTYPE_COMPONENTS;
+  const dashboard = window.PROTOTYPE_DASHBOARD;
   const mountNode = document.getElementById("base");
   const navState = components ? components.createNavigationState(config) : {};
   const explicitPageKey = getExplicitPageKey();
@@ -216,7 +217,7 @@
 
   function runPageSetup(pageKey, page) {
     if (!page || typeof page.setup !== "function") {
-      pageCleanup = null;
+      pageCleanup = runFallbackPageSetup(pageKey, page);
       return;
     }
 
@@ -232,6 +233,35 @@
     });
 
     pageCleanup = typeof cleanup === "function" ? cleanup : null;
+  }
+
+  function runFallbackPageSetup(pageKey, page) {
+    if (!page || !dashboard) {
+      return null;
+    }
+
+    const runtime = {
+      pageKey: pageKey,
+      page: page,
+      config: config,
+      mountNode: mountNode,
+      mockStore: mockStore,
+      showToast: components.showToast,
+      navigateToRoute: navigateToRoute,
+      getRouteHref: getRouteHref
+    };
+
+    if (page.kind === "dashboard" && page.dashboardVariant === "offline-task-create" && typeof dashboard.bindOfflineTaskCreatePage === "function") {
+      const cleanup = dashboard.bindOfflineTaskCreatePage(runtime);
+      return typeof cleanup === "function" ? cleanup : null;
+    }
+
+    if (page.kind === "dashboard" && page.dashboardVariant === "stream-task-create" && typeof dashboard.bindTaskCreatePage === "function") {
+      const cleanup = dashboard.bindTaskCreatePage(runtime);
+      return typeof cleanup === "function" ? cleanup : null;
+    }
+
+    return null;
   }
 
   function runPageCleanup() {
