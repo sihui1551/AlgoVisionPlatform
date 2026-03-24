@@ -266,6 +266,7 @@
     accessSourcePage: {
       typeOrder: [ALL, "gb_device", "stream_proxy"],
       rows: ROWS,
+      activeProxyId: "",
       statusOptions: [{ value: "", label: "全部状态" }].concat(runtimeOptions()),
       enabledOptions: [{ value: "", label: "全部启用状态" }].concat(ENABLED_OPTIONS)
     },
@@ -275,7 +276,6 @@
         '<div id="access-source-tabs" class="access-source-tabs">' + renderTabs(ctx.page.accessSourcePage, typeOpts, ALL) + '</div>' +
         '<div class="table-toolbar access-source-toolbar"><div class="toolbar-group access-source-filters">' +
         '<label class="access-source-filter"><span class="access-source-filter-label">搜索</span><input id="access-source-search" class="filter-field" type="search" placeholder="名称 / 标识 / 地址" /></label>' +
-        '<label class="access-source-filter"><span class="access-source-filter-label">来源类型</span>' + selectHtml("access-source-type", typeOpts) + "</label>" +
         '<label class="access-source-filter"><span class="access-source-filter-label">运行状态</span>' + selectHtml("access-source-status", ctx.page.accessSourcePage.statusOptions) + "</label>" +
         '<label class="access-source-filter"><span class="access-source-filter-label">启用状态</span>' + selectHtml("access-source-enabled", ctx.page.accessSourcePage.enabledOptions) + "</label>" +
         '<button id="access-source-query" class="button" type="button">查询</button><button id="access-source-reset" class="button-secondary" type="button">重置</button>' +
@@ -308,12 +308,12 @@
 
       function render() {
         const rws = filtered(rows(), n, s.type, u);
-        const cols = columns(n.type.value || s.type);
+        const cols = columns(s.type);
         n.head.innerHTML = cols.map(function (c) { return "<th>" + u.escapeHtml(c.label) + "</th>"; }).join("");
         n.body.innerHTML = rws.length ? rws.map(function (r) { return rowHtml(r, cols, u); }).join("") : emptyHtml(cols.length, p.emptyText);
         n.count.textContent = p.countTextPrefix + rws.length + p.countTextUnit;
         n.tabs.innerHTML = renderTabs(p.accessSourcePage, typeOptions(p.accessSourcePage), s.type, rows());
-        n.add.textContent = META[n.type.value] ? "+ 新增" + META[n.type.value].label : "+ 新增接入源";
+        n.add.textContent = META[s.type] ? "+ 新增" + META[s.type].label : "+ 新增接入源";
       }
 
       function openInfo(row) {
@@ -373,7 +373,6 @@
         const tab = e.target.closest("[data-access-type]");
         if (tab) {
           s.type = tab.getAttribute("data-access-type") || ALL;
-          n.type.value = s.type;
           render();
           return;
         }
@@ -406,14 +405,17 @@
 
           if (action === "delete-row" && row) {
             p.accessSourcePage.rows = rows().filter(function (x) { return x.id !== row.id; });
+            if (p.accessSourcePage.activeProxyId === row.id) {
+              p.accessSourcePage.activeProxyId = "";
+            }
             persist();
             render();
             rt.showToast("删除成功", "已删除接入源 " + row.name + "。");
             return;
           }
 
-          if (action === "proxy-edit" && row && rt.mockStore && typeof rt.mockStore.patchPage === "function") {
-            rt.mockStore.patchPage("stream-proxy", { streamProxyPage: { activeProxyId: row.id } });
+          if ((action === "proxy-edit" || action === "open-cloud-record") && row && rt.mockStore && typeof rt.mockStore.patchPage === "function") {
+            rt.mockStore.patchPage("access-source", { accessSourcePage: { activeProxyId: row.id } });
             return;
           }
 
@@ -510,17 +512,12 @@
       }
 
       n.search.addEventListener("input", render);
-      n.type.addEventListener("change", function () {
-        s.type = n.type.value || ALL;
-        render();
-      });
       n.status.addEventListener("change", render);
       n.enabled.addEventListener("change", render);
       n.query.addEventListener("click", render);
       n.reset.addEventListener("click", function () {
         n.search.value = "";
         s.type = ALL;
-        n.type.value = ALL;
         n.status.value = "";
         n.enabled.value = "";
         render();
@@ -535,7 +532,6 @@
       rt.mountNode.addEventListener("change", onTableChange);
       window.addEventListener("keydown", onEsc);
 
-      n.type.value = ALL;
       hydrateRows();
       render();
 
@@ -552,7 +548,6 @@
   function ids() {
     return {
       search: g("access-source-search"),
-      type: g("access-source-type"),
       status: g("access-source-status"),
       enabled: g("access-source-enabled"),
       query: g("access-source-query"),
@@ -713,7 +708,7 @@
       return '<button class="table-action access-source-action-link" type="button" data-access-action="refresh-row" data-access-id="' + u.escapeAttribute(r.id) + '">刷新</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="gb-channel-list">通道</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="gb-device-edit">编辑</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-access-action="delete-row" data-access-id="' + u.escapeAttribute(r.id) + '">删除</button>';
     }
 
-    return '<button class="table-action access-source-action-link" type="button" data-access-action="play" data-access-id="' + u.escapeAttribute(r.id) + '">播放</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="stream-proxy-edit" data-access-action="proxy-edit" data-access-id="' + u.escapeAttribute(r.id) + '">编辑</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="cloud-record">云端录像</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-access-action="delete-row" data-access-id="' + u.escapeAttribute(r.id) + '">删除</button>';
+    return '<button class="table-action access-source-action-link" type="button" data-access-action="play" data-access-id="' + u.escapeAttribute(r.id) + '">播放</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="stream-proxy-edit" data-access-action="proxy-edit" data-access-id="' + u.escapeAttribute(r.id) + '">编辑</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-route="cloud-record" data-access-action="open-cloud-record" data-access-id="' + u.escapeAttribute(r.id) + '">云端录像</button><span class="access-source-action-divider">|</span><button class="table-action access-source-action-link" type="button" data-access-action="delete-row" data-access-id="' + u.escapeAttribute(r.id) + '">删除</button>';
   }
 
   function transportModeSelectHtml(row, u) {

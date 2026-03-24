@@ -199,7 +199,7 @@
       styleSource: meta.mode === "create" ? "resources/css/pages/stream-proxy-create.css" : "resources/css/pages/stream-proxy-edit.css",
       heading: meta.heading,
       subtitle: meta.subtitle,
-      breadcrumbTrail: ["接入管理", "拉流代理"],
+      breadcrumbTrail: ["接入管理", "接入源管理"],
       streamProxyEditPage: {
         mode: meta.mode,
         title: meta.title,
@@ -468,12 +468,12 @@
         return;
       }
 
-      const listPage = getStreamProxyPage();
-      const streamPage = listPage.streamProxyPage || {};
-      const rows = Array.isArray(streamPage.rows) ? streamPage.rows : [];
-      const activeProxyId = streamPage.activeProxyId || "";
+      const listPage = getAccessSourcePage();
+      const sourcePage = listPage.accessSourcePage || {};
+      const rows = Array.isArray(sourcePage.rows) ? sourcePage.rows : [];
+      const activeProxyId = sourcePage.activeProxyId || "";
       const row = rows.find(function (item) {
-        return item.id === activeProxyId;
+        return item.id === activeProxyId && isStreamProxyRow(item);
       });
 
       if (!row) {
@@ -563,15 +563,15 @@
         return;
       }
 
-      const listPage = getStreamProxyPage();
-      const streamPage = listPage.streamProxyPage || {};
-      const rows = Array.isArray(streamPage.rows) ? streamPage.rows.slice() : [];
-      let targetId = currentEditingId || streamPage.activeProxyId || "";
+      const listPage = getAccessSourcePage();
+      const sourcePage = listPage.accessSourcePage || {};
+      const rows = Array.isArray(sourcePage.rows) ? sourcePage.rows.slice() : [];
+      let targetId = currentEditingId || sourcePage.activeProxyId || "";
       let nextRow = null;
 
       if (mode === "edit") {
         const rowIndex = rows.findIndex(function (item) {
-          return item.id === targetId;
+          return item.id === targetId && isStreamProxyRow(item);
         });
 
         if (rowIndex < 0) {
@@ -590,8 +590,8 @@
       }
 
       currentEditingId = targetId;
-      mockStore.patchPage("stream-proxy", {
-        streamProxyPage: {
+      mockStore.patchPage("access-source", {
+        accessSourcePage: {
           rows: rows,
           activeProxyId: targetId
         }
@@ -606,9 +606,9 @@
       }
     }
 
-    function getStreamProxyPage() {
+    function getAccessSourcePage() {
       const storedPage = mockStore && typeof mockStore.getPage === "function"
-        ? mockStore.getPage("stream-proxy")
+        ? mockStore.getPage("access-source")
         : null;
       return storedPage || {};
     }
@@ -818,13 +818,20 @@
 
     return {
       id: sourceRow.id || createProxyId(),
+      sourceType: "stream_proxy",
+      sourceTypeLabel: "\u62c9\u6d41\u8bbe\u5907",
+      name: proxyInfo.appName || sourceRow.name || proxyInfo.streamId || "",
       appName: proxyInfo.appName,
       streamId: proxyInfo.streamId,
+      sourceCode: proxyInfo.streamId,
       streamUrl: proxyInfo.streamUrl,
+      endpoint: proxyInfo.streamUrl,
       mediaServer: sourceRow.mediaServer || "zlmediakit-local",
       proxyMode: getOptionLabel(typeOptions, proxyInfo.type, "默认"),
       gbCode: channelInfo.code || sourceRow.gbCode || "",
       pullStatus: sourceRow.pullStatus || "idle",
+      runtimeStatus: sourceRow.runtimeStatus || sourceRow.pullStatus || "idle",
+      runtimeStatusLabel: sourceRow.runtimeStatusLabel || sourceRow.pullStatusLabel || "\u6682\u672a\u62c9\u6d41",
       pullStatusLabel: sourceRow.pullStatusLabel || "暂未拉流",
       enabled: enabled ? "enabled" : "disabled",
       enabledLabel: enabled ? "已启用" : "已停用",
@@ -836,6 +843,18 @@
 
   function createProxyId() {
     return "proxy-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+
+  function isStreamProxyRow(row) {
+    if (!row) {
+      return false;
+    }
+
+    if (row.sourceType) {
+      return row.sourceType === "stream_proxy";
+    }
+
+    return !!(row.appName || row.streamId || row.streamUrl || row.proxyMode || row.pullStatus || row.gbCode);
   }
 
   function mapProxyModeToType(proxyModeLabel) {

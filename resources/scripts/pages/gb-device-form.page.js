@@ -64,7 +64,7 @@
       styleSource: "resources/css/pages/gb-device-form.css",
       heading: config.heading,
       subtitle: "配置国标设备的接入参数、编码与附加选项。",
-      breadcrumbTrail: ["接入管理", "国标设备"],
+      breadcrumbTrail: ["接入管理", "接入源管理"],
       gbDeviceFormPage: {
         panelTitle: config.panelTitle,
         submitToastTitle: config.submitToastTitle,

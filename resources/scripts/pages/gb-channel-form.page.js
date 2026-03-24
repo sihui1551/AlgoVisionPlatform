@@ -128,7 +128,7 @@
     styleSource: "resources/css/pages/gb-channel-form.css",
     heading: "编辑通道",
     subtitle: "维护通道基础信息、注册属性和扩展能力配置。",
-    breadcrumbTrail: ["接入管理", "国标设备", "通道列表"],
+    breadcrumbTrail: ["接入管理", "接入源管理", "通道列表"],
     gbChannelFormPage: {
       title: "编辑通道",
       backRoute: "gb-channel-list",

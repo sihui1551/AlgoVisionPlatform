@@ -41,14 +41,6 @@
           "label": "接入源管理"
         },
         {
-          "key": "gb-device",
-          "label": "国标设备"
-        },
-        {
-          "key": "stream-proxy",
-          "label": "拉流代理"
-        },
-        {
           "key": "local-video",
           "label": "本地视频"
         }
@@ -126,16 +118,6 @@
       "key": "access-source",
       "file": "接入源管理.html",
       "source": "resources/scripts/pages/access-source.page.js"
-    },
-    "gb-device": {
-      "key": "gb-device",
-      "file": "国标设备.html",
-      "source": "resources/scripts/pages/gb-device.page.js"
-    },
-    "stream-proxy": {
-      "key": "stream-proxy",
-      "file": "拉流代理.html",
-      "source": "resources/scripts/pages/stream-proxy.page.js"
     },
     "local-video": {
       "key": "local-video",

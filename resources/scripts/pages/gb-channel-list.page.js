@@ -21,7 +21,7 @@
     kind: "table",
     heading: "通道列表",
     subtitle: "查看设备通道基础信息、码流类型和音频配置。",
-    breadcrumbTrail: ["接入管理", "国标设备"],
+    breadcrumbTrail: ["接入管理", "接入源管理"],
     emptyText: "暂无通道数据",
     gbChannelPage: {
       rows: CHANNEL_ROWS,

@@ -5,7 +5,7 @@
     kind: "dashboard",
     heading: "云端录像",
     subtitle: "录像播放器",
-    breadcrumbTrail: ["接入管理", "拉流代理"],
+    breadcrumbTrail: ["接入管理", "接入源管理"],
     renderDashboardPage: function () {
       return renderPlayerPage();
     },
@@ -55,12 +55,12 @@
       return;
     }
 
-    const streamProxyPage = mockStore.getPage("stream-proxy") || {};
-    const streamProxyData = streamProxyPage.streamProxyPage || {};
-    const rows = Array.isArray(streamProxyData.rows) ? streamProxyData.rows : [];
-    const activeId = streamProxyData.activeProxyId || "";
+    const accessSourcePage = mockStore.getPage("access-source") || {};
+    const accessSourceData = accessSourcePage.accessSourcePage || {};
+    const rows = Array.isArray(accessSourceData.rows) ? accessSourceData.rows : [];
+    const activeId = accessSourceData.activeProxyId || "";
     const row = rows.find(function (item) {
-      return item.id === activeId;
+      return item.id === activeId && isStreamProxyRow(item);
     }) || null;
 
     const nameNode = root.querySelector("[data-cloud-record-name]");
@@ -73,5 +73,17 @@
     if (sourceNode) {
       sourceNode.textContent = row && row.streamUrl ? row.streamUrl : "--";
     }
+  }
+
+  function isStreamProxyRow(row) {
+    if (!row) {
+      return false;
+    }
+
+    if (row.sourceType) {
+      return row.sourceType === "stream_proxy";
+    }
+
+    return !!(row.appName || row.streamId || row.streamUrl || row.proxyMode || row.pullStatus || row.gbCode);
   }
 })();
