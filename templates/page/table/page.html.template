@@ -1,77 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
   <head>
-    <title>__PAGE_TITLE__</title>
+    <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <link href="resources/css/axure_rp_page.css" type="text/css" rel="stylesheet"/>
-    <link href="data/styles.css" type="text/css" rel="stylesheet"/>
-    <link href="files/__PAGE_NAME__/styles.css" type="text/css" rel="stylesheet"/>
-    <link href="resources/css/prototype.css" type="text/css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
-    <script src="resources/scripts/jquery-3.7.1.min.js"></script>
-    <script src="resources/scripts/axure/axQuery.js"></script>
-    <script src="resources/scripts/axure/globals.js"></script>
-    <script src="resources/scripts/axutils.js"></script>
-    <script src="resources/scripts/axure/annotation.js"></script>
-    <script src="resources/scripts/axure/axQuery.std.js"></script>
-    <script src="resources/scripts/axure/doc.js"></script>
-    <script src="resources/scripts/messagecenter.js"></script>
-    <script src="resources/scripts/axure/events.js"></script>
-    <script src="resources/scripts/axure/recording.js"></script>
-    <script src="resources/scripts/axure/action.js"></script>
-    <script src="resources/scripts/axure/expr.js"></script>
-    <script src="resources/scripts/axure/geometry.js"></script>
-    <script src="resources/scripts/axure/flyout.js"></script>
-    <script src="resources/scripts/axure/model.js"></script>
-    <script src="resources/scripts/axure/repeater.js"></script>
-    <script src="resources/scripts/axure/sto.js"></script>
-    <script src="resources/scripts/axure/utils.temp.js"></script>
-    <script src="resources/scripts/axure/variables.js"></script>
-    <script src="resources/scripts/axure/drag.js"></script>
-    <script src="resources/scripts/axure/move.js"></script>
-    <script src="resources/scripts/axure/visibility.js"></script>
-    <script src="resources/scripts/axure/style.js"></script>
-    <script src="resources/scripts/axure/adaptive.js"></script>
-    <script src="resources/scripts/axure/tree.js"></script>
-    <script src="resources/scripts/axure/init.temp.js"></script>
-    <script src="resources/scripts/axure/legacy.js"></script>
-    <script src="resources/scripts/axure/viewer.js"></script>
-    <script src="resources/scripts/axure/math.js"></script>
-    <script src="resources/scripts/axure/jquery.nicescroll.min.js"></script>
-    <script src="data/document.js"></script>
-    <script src="files/__PAGE_NAME__/data.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>__PAGE_TITLE__</title>
+    <link href="../assets/css/prototype.css" type="text/css" rel="stylesheet"/>
+    <link href="../assets/css/pages/__PAGE_KEY__.css" type="text/css" rel="stylesheet"/>
     <script type="text/javascript">
-      $axure.utils.getTransparentGifPath = function() { return 'resources/images/transparent.gif'; };
-      $axure.utils.getOtherPath = function() { return 'resources/Other.html'; };
-      $axure.utils.getReloadPath = function() { return 'resources/reload.html'; };
       window.PROTOTYPE_PAGE_KEY = "__PAGE_KEY__";
       window.PROTOTYPE_ROUTE_MODE = "page";
     </script>
   </head>
   <body>
-    <div id="base" class="">
-
-      <div id="u0" class="ax_default _一级标题 transition notrs">
-        <div id="u0_div" class=""></div>
-        <div id="u0_text" class="text ">
-          <p><span>这是__PAGE_TITLE__页面</span></p>
-        </div>
-      </div>
-    </div>
-    <script src="resources/scripts/prototype.config.js"></script>
-    <script src="resources/scripts/prototype.page-loader.js"></script>
-    <script src="resources/scripts/prototype.style-loader.js"></script>
-    <script src="resources/scripts/pages/__PAGE_KEY__.page.js"></script>
-    <script src="resources/scripts/mock-store.js"></script>
-    <script src="resources/scripts/prototype.utils.js"></script>
-    <script src="resources/scripts/prototype.shell.js"></script>
-    <script src="resources/scripts/prototype.dashboard.js"></script>
-    <script src="resources/scripts/prototype.table.js"></script>
-    <script src="resources/scripts/prototype.components.js"></script>
-    <script src="resources/scripts/prototype.js"></script>
-    <script src="resources/scripts/axure/ios.js"></script>
+    <div id="base"></div>
+    <script src="../assets/js/config/prototype.config.js"></script>
+    <script src="../assets/js/core/prototype.page-loader.js"></script>
+    <script src="../assets/js/core/prototype.style-loader.js"></script>
+    <script src="../assets/js/core/mock-store.js"></script>
+    <script src="../assets/js/core/prototype.utils.js"></script>
+    <script src="../assets/js/core/prototype.shell.js"></script>
+    <script src="../assets/js/core/prototype.dashboard.js"></script>
+    <script src="../assets/js/core/prototype.table.js"></script>
+    <script src="../assets/js/core/prototype.components.js"></script>
+    <script src="../assets/js/core/prototype.js"></script>
   </body>
 </html>

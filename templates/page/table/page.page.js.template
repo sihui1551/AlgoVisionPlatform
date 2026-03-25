@@ -1,6 +1,6 @@
 window.registerPrototypePage({
   key: "__PAGE_KEY__",
-  styleSource: "resources/css/pages/__PAGE_KEY__.css",
+  styleSource: "../assets/css/pages/__PAGE_KEY__.css",
   kind: "table",
   heading: "__PAGE_TITLE__",
   subtitle: "请替换为页面说明",
