@@ -1,6 +1,9 @@
 (function () {
   const HEADING_TEXT = "新建离线视图分析任务";
   const BREADCRUMB_TRAIL = ["任务管理", HEADING_TEXT];
+  const LOCAL_VIDEO_PAGE_KEY = "local-video";
+  const OFFLINE_ANALYSIS_PAGE_KEY = "offline-analysis";
+  const LOCAL_VIDEO_SYNC_REMARK = "来自离线任务本地上传";
 
   window.registerPrototypePage({
     key: "offline-task-create",
@@ -168,6 +171,13 @@
     const initialState = ensureOfflineState(page);
     syncOfflineSelectedAlgorithms(initialState, page.offlineTaskBuilder || {});
     syncOfflineBreadcrumb(runtime);
+    page.__offlineLocalVideoRows = [];
+    loadOfflineLocalVideoRows(runtime, page).then(function (rows) {
+      page.__offlineLocalVideoRows = rows;
+      if (ensureOfflineState(page).modals.localVideo) {
+        rerender();
+      }
+    });
 
     function rerender() {
       root.innerHTML = renderOfflineTaskCreatePage(page, window.PROTOTYPE_SHELL, window.PROTOTYPE_UTILS);
@@ -379,13 +389,89 @@
         return;
       }
 
-      if (action === "start-analysis" && typeof runtime.showToast === "function") {
-        runtime.showToast("启动分析", "当前原型模拟启动离线分析任务。");
+      if (action === "local-video-open") {
+        const activeAlgorithmKey = state.activeTab || "";
+        if (!activeAlgorithmKey) {
+          if (typeof runtime.showToast === "function") {
+            runtime.showToast("从本地视频选择", "请先在上方选择分析算法。");
+          }
+          return;
+        }
+
+        loadOfflineLocalVideoRows(runtime, page).then(function (rows) {
+          page.__offlineLocalVideoRows = rows;
+          state.modals.localVideo = true;
+          state.modalDraft.localVideoChecked = [];
+          rerender();
+        });
         return;
       }
 
-      if (action === "save-draft" && typeof runtime.showToast === "function") {
-        runtime.showToast("保存草稿", "当前原型模拟保存离线分析草稿。");
+      if (action === "local-video-row-toggle") {
+        toggleValue(state.modalDraft.localVideoChecked, key);
+        rerender();
+        return;
+      }
+
+      if (action === "local-video-save") {
+        const activeAlgorithmKey = state.activeTab || "";
+        if (!activeAlgorithmKey) {
+          closeModal(state, "localVideo");
+          rerender();
+          return;
+        }
+
+        const selectedRows = getOfflineLocalVideoRows(page, state.materialType).filter(function (row) {
+          return state.modalDraft.localVideoChecked.indexOf(row.id) !== -1;
+        });
+        if (!selectedRows.length) {
+          if (typeof runtime.showToast === "function") {
+            runtime.showToast("从本地视频选择", "请先勾选至少一条本地视频记录。");
+          }
+          return;
+        }
+        const result = appendOfflineMaterialsFromLocalVideoRows(state, builder, activeAlgorithmKey, selectedRows);
+        persistOfflineTaskState(runtime, page, state);
+        closeModal(state, "localVideo");
+        state.modalDraft.localVideoChecked = [];
+        rerender();
+        scrollToOfflineMaterials(root);
+        if (typeof runtime.showToast === "function") {
+          if (result.added > 0) {
+            runtime.showToast(
+              "从本地视频选择",
+              "已添加 " + result.added + " 个素材" + (result.skipped ? "，忽略 " + result.skipped + " 个重复素材" : "") + "。"
+            );
+          } else {
+            runtime.showToast(
+              "从本地视频选择",
+              "所选素材已存在于离线素材列表中" + (result.skipped ? "，已忽略 " + result.skipped + " 个重复素材" : "。")
+            );
+          }
+        }
+        return;
+      }
+
+      if (action === "start-analysis" || action === "save-draft") {
+        submitOfflineTask(runtime, page, state, builder, action === "start-analysis" ? "start" : "draft").then(function (result) {
+          if (result && result.ok) {
+            return;
+          }
+
+          if (typeof runtime.showToast === "function") {
+            runtime.showToast(
+              action === "start-analysis" ? "启动分析" : "保存草稿",
+              (result && result.message) || "当前操作未成功，请稍后重试。"
+            );
+          }
+        }).catch(function () {
+          if (typeof runtime.showToast === "function") {
+            runtime.showToast(
+              action === "start-analysis" ? "启动分析" : "保存草稿",
+              "当前操作未成功，请稍后重试。"
+            );
+          }
+        });
         return;
       }
 
@@ -414,6 +500,7 @@
         config.materials = ensureList(config.materials).filter(function (item) {
           return item.key !== key;
         });
+        persistOfflineTaskState(runtime, page, state);
         rerender();
       }
     }
@@ -426,9 +513,31 @@
 
       const state = ensureOfflineState(page);
       const fieldName = field.getAttribute("data-offline-field");
+      const builder = normalizeOfflineBuilder(page);
 
       if (fieldName === "taskName") {
         state.taskName = field.value || "";
+        persistOfflineTaskState(runtime, page, state);
+        return;
+      }
+
+      if (fieldName === "interval") {
+        const algorithmKey = field.getAttribute("data-offline-algorithm-key") || state.activeTab || "";
+        if (!algorithmKey) {
+          return;
+        }
+
+        const configs = ensureOfflineAlgorithmConfigs(state, builder);
+        if (!configs[algorithmKey]) {
+          configs[algorithmKey] = {
+            version: "V1.0",
+            interval: "5",
+            materials: []
+          };
+        }
+
+        configs[algorithmKey].interval = normalizeOfflineInterval(field.value);
+        persistOfflineTaskState(runtime, page, state);
       }
     }
 
@@ -457,10 +566,24 @@
       }
 
       const result = appendOfflineMaterialsFromFiles(state, builder, activeAlgorithmKey, files);
-      if (typeof runtime.showToast === "function") {
-        runtime.showToast("添加视图", "已添加 " + result.added + " 个文件" + (result.skipped ? "，忽略 " + result.skipped + " 个不支持或重复文件" : "") + "。");
-      }
+      persistOfflineTaskState(runtime, page, state);
       rerender();
+
+      syncUploadedFilesToLocalVideo(runtime, page, files).then(function (syncResult) {
+        if (typeof runtime.showToast === "function") {
+          runtime.showToast(
+            "添加视图",
+            "已添加 " + result.added + " 个文件" +
+              (result.skipped ? "，忽略 " + result.skipped + " 个不支持或重复文件" : "") +
+              (syncResult.added ? "，并同步到本地视频 " + syncResult.added + " 条记录" : "") +
+              "。"
+          );
+        }
+      }).catch(function () {
+        if (typeof runtime.showToast === "function") {
+          runtime.showToast("添加视图", "已添加 " + result.added + " 个文件" + (result.skipped ? "，忽略 " + result.skipped + " 个不支持或重复文件" : "") + "。");
+        }
+      });
     }
 
     root.addEventListener("click", handleClick);
@@ -485,6 +608,7 @@
     const activeTab = findByKey(algorithmTabs, state.activeTab) || algorithmTabs[0] || {};
     const materials = ensureList(activeTab.materials);
     const materialType = state.materialType || builder.defaultMaterialType || "video";
+    const localVideoRows = getOfflineLocalVideoRows(page, materialType);
     const selectedAlgorithms = findByKeys(builder.algorithms, state.selectedAlgorithms);
     const selectedRecipients = findByKeys(builder.recipients, state.selectedRecipients);
     const selectedSpec = findByKey(builder.resourceSpecs, state.selectedSpecKey);
@@ -528,6 +652,7 @@
       renderOfflineAlgorithmModal(builder, state, safeUtils) +
       renderOfflineRecipientModal(builder, state, safeUtils) +
       renderOfflineSpecModal(builder, state, safeUtils) +
+      renderOfflineLocalVideoModal(state, materialType, localVideoRows, safeUtils) +
       "</section>"
     );
   }
@@ -605,8 +730,10 @@
       : '<span class="offline-placeholder">请先在上方选择分析算法</span>';
     const metaMarkup = hasSelectedAlgorithms
       ? (
+        '<div class="offline-meta-group">' +
         '<div class="offline-meta-pair"><span class="offline-meta-label">算法版本</span><span class="offline-meta-chip">' + utils.escapeHtml(activeTab.version || "V1.0") + "</span></div>" +
-        '<div class="offline-meta-pair"><span class="offline-meta-label">抽帧间隔</span><span class="offline-meta-inline"><input class="source-form-control offline-interval-input" type="text" value="' + utils.escapeAttribute(activeTab.interval || "5") + '" /><span class="offline-meta-unit">秒</span></span></div>'
+        '<div class="offline-meta-pair"><span class="offline-meta-label">抽帧间隔</span><span class="offline-meta-inline"><input class="source-form-control offline-interval-input" type="text" data-offline-field="interval" data-offline-algorithm-key="' + utils.escapeAttribute(activeTab.key || "") + '" value="' + utils.escapeAttribute(activeTab.interval || "5") + '" /><span class="offline-meta-unit">秒</span></span></div>' +
+        "</div>"
       )
       : '<div class="offline-meta-pair"><span class="offline-meta-label">未选择分析算法，暂无算法配置</span></div>';
 
@@ -616,12 +743,15 @@
       "<div>" +
       '<h3 class="offline-stage-title">离线素材</h3>' +
       "</div>" +
-      '<button class="button" type="button" data-offline-action="add-material">添加视图</button>' +
+      '<div class="offline-stage-header-actions">' +
+      '<button class="button-secondary" type="button" data-offline-action="local-video-open">从本地视频选择</button>' +
+      '<button class="button" type="button" data-offline-action="add-material">添加' + utils.escapeHtml(materialType === "video" ? "视频" : "图片") + "</button>" +
+      "</div>" +
       "</div>" +
       '<div class="offline-dropzone">' +
       '<input class="offline-file-input" type="file" data-offline-file-picker="material" multiple accept="video/*,image/*,.zip,.rar,.7z,.tar,.gz,.bz2,.xz" />' +
       '<div class="offline-dropzone-title">支持多' + utils.escapeHtml(materialType === "video" ? "视频" : "图片") + '批量导入（支持压缩包）</div>' +
-      '<div class="offline-dropzone-text">点击右上角【添加视图】上传本地图片、视频或压缩包。</div>' +
+      '<div class="offline-dropzone-text">点击右上角【添加' + utils.escapeHtml(materialType === "video" ? "视频" : "图片") + '】上传本地素材，或从【本地视频】中直接复用已有记录。</div>' +
       "</div>" +
       '<div class="offline-algorithm-tabs">' +
       tabMarkup +
@@ -658,6 +788,53 @@
       "</div>" +
       "</div>" +
       "</section>"
+    );
+  }
+
+  function renderOfflineLocalVideoModal(state, materialType, rows, utils) {
+    if (!state.modals.localVideo) {
+      return "";
+    }
+
+    const checkedMap = createLookupMap(state.modalDraft.localVideoChecked);
+    const list = ensureList(rows);
+
+    return (
+      '<div class="offline-modal-layer">' +
+      '<button class="offline-modal-mask" type="button" data-offline-modal-close="localVideo" aria-label="关闭弹窗"></button>' +
+      '<section class="offline-modal offline-modal-local-video" role="dialog" aria-modal="true">' +
+      '<div class="offline-modal-header">' +
+      '<div><h3 class="offline-modal-title">从本地视频选择</h3></div>' +
+      '<button class="offline-modal-close" type="button" data-offline-modal-close="localVideo">×</button>' +
+      "</div>" +
+      '<div class="table-shell offline-local-video-table">' +
+      "<table>" +
+      "<thead><tr><th></th><th>记录名称</th><th>文件类型</th><th>文件数量</th><th>备注</th><th>创建时间</th></tr></thead>" +
+      "<tbody>" +
+      (list.length
+        ? list.map(function (row) {
+          const checked = !!checkedMap[row.id];
+          return (
+            "<tr>" +
+            '<td class="offline-check-cell"><button class="offline-table-check' + (checked ? " checked" : "") + '" type="button" data-offline-action="local-video-row-toggle" data-offline-key="' + utils.escapeAttribute(row.id || "") + '"></button></td>' +
+            "<td>" + utils.escapeHtml(row.recordName || "--") + "</td>" +
+            "<td>" + utils.escapeHtml(row.fileTypeLabel || "--") + "</td>" +
+            "<td>" + utils.escapeHtml(String(row.fileCount || "--")) + "</td>" +
+            "<td>" + utils.escapeHtml(row.remark || "--") + "</td>" +
+            "<td>" + utils.escapeHtml(row.createdAt || "--") + "</td>" +
+            "</tr>"
+          );
+        }).join("")
+        : '<tr><td colspan="6"><div class="empty-state offline-empty-state">暂无可复用的本地视频记录</div></td></tr>') +
+      "</tbody>" +
+      "</table>" +
+      "</div>" +
+      '<div class="offline-modal-footer">' +
+      '<button class="button-secondary" type="button" data-offline-modal-close="localVideo">取消</button>' +
+      '<button class="button" type="button" data-offline-action="local-video-save">添加到当前任务</button>' +
+      "</div>" +
+      "</section>" +
+      "</div>"
     );
   }
 
@@ -838,11 +1015,13 @@
       selectedAlgorithms: ensureList(builder.defaultAlgorithms).slice(),
       selectedRecipients: ensureList(builder.defaultRecipients).slice(),
       selectedSpecKey: builder.defaultSpecKey || ((builder.resourceSpecs[0] || {}).key || ""),
+      analysisTaskId: "",
       algorithmConfigs: {},
       modals: {
         algorithm: false,
         recipient: false,
-        spec: false
+        spec: false,
+        localVideo: false
       },
       modalDraft: {
         algorithms: [],
@@ -850,12 +1029,232 @@
         algorithmSelectedChecked: [],
         recipients: [],
         recipientChecked: [],
-        specKey: ""
+        specKey: "",
+        localVideoChecked: []
       }
     };
     syncOfflineSelectedAlgorithms(page.__offlineTaskCreateState, builder);
 
     return page.__offlineTaskCreateState;
+  }
+
+  function submitOfflineTask(runtime, page, state, builder, mode) {
+    const validation = validateOfflineTaskSubmission(state, builder, mode);
+    if (!validation.ok) {
+      return Promise.resolve(validation);
+    }
+
+    return loadOfflineAnalysisSeed(page).then(function (seedPage) {
+      const currentPage = runtime.mockStore && typeof runtime.mockStore.getPage === "function"
+        ? runtime.mockStore.getPage(OFFLINE_ANALYSIS_PAGE_KEY, seedPage)
+        : (seedPage || {});
+      const taskPage = currentPage && currentPage.offlineTaskPage ? currentPage.offlineTaskPage : {};
+      const rows = ensureList(taskPage.rows).slice();
+      const existingIndex = rows.findIndex(function (row) {
+        return row && row.id === state.analysisTaskId;
+      });
+      const existingRow = existingIndex === -1 ? null : rows[existingIndex];
+      const row = buildOfflineAnalysisRow(state, builder, mode, existingRow);
+
+      if (existingIndex !== -1) {
+        rows.splice(existingIndex, 1);
+      }
+      rows.unshift(row);
+
+      if (runtime.mockStore && typeof runtime.mockStore.patchPage === "function") {
+        runtime.mockStore.patchPage(OFFLINE_ANALYSIS_PAGE_KEY, {
+          offlineTaskPage: {
+            rows: rows
+          }
+        }, seedPage);
+      }
+
+      state.analysisTaskId = row.id;
+      persistOfflineTaskState(runtime, page, state);
+
+      if (typeof runtime.navigateToRoute === "function") {
+        runtime.navigateToRoute(OFFLINE_ANALYSIS_PAGE_KEY);
+      }
+
+      return { ok: true, row: row };
+    });
+  }
+
+  function validateOfflineTaskSubmission(state, builder, mode) {
+    const selectedAlgorithms = findByKeys(builder.algorithms, state.selectedAlgorithms);
+    const materials = collectOfflineTaskMaterials(state, builder);
+
+    if (!selectedAlgorithms.length) {
+      return {
+        ok: false,
+        message: "请至少选择一个分析算法。"
+      };
+    }
+
+    if (mode === "start" && !String(state.taskName || "").trim()) {
+      return {
+        ok: false,
+        message: "请输入任务名称后再启动分析。"
+      };
+    }
+
+    if (mode === "start" && !materials.length) {
+      return {
+        ok: false,
+        message: "请先添加离线素材后再启动分析。"
+      };
+    }
+
+    return { ok: true };
+  }
+
+  function buildOfflineAnalysisRow(state, builder, mode, existingRow) {
+    const now = new Date();
+    const materialType = state.materialType || builder.defaultMaterialType || "video";
+    const selectedAlgorithms = findByKeys(builder.algorithms, state.selectedAlgorithms);
+    const selectedRecipients = findByKeys(builder.recipients, state.selectedRecipients);
+    const selectedSpec = findByKey(builder.resourceSpecs, state.selectedSpecKey);
+    const algorithmConfigs = ensureOfflineAlgorithmConfigs(state, builder);
+    const materials = collectOfflineTaskMaterials(state, builder);
+    const taskName = String(state.taskName || "").trim() || buildOfflineDraftTaskName(now);
+
+    return {
+      id: existingRow && existingRow.id ? existingRow.id : buildOfflineTaskRecordId(now),
+      batchNo: existingRow && existingRow.batchNo ? existingRow.batchNo : buildOfflineBatchNo(now),
+      taskName: taskName,
+      inputTypeLabel: resolveOfflineInputTypeLabel(materials),
+      materialType: materialType,
+      materialTypeLabel: resolveOfflineMaterialTypeLabel(builder, materialType),
+      fileCount: formatOfflineTaskFileCount(materials.length, materialType),
+      algorithms: selectedAlgorithms.map(function (item) {
+        return item.label || item.name || "--";
+      }).join(" / "),
+      executionStatus: mode === "start" ? "running" : "pending",
+      executionStatusTone: mode === "start" ? "success" : "warning",
+      executionStatusLabel: mode === "start" ? "处理中" : "待启动",
+      resultStatusTone: mode === "start" ? "success" : "idle",
+      resultStatusLabel: mode === "start" ? "分析中" : "未开始",
+      submittedAt: formatTimestamp(now),
+      actionItems: buildOfflineAnalysisActionItems(mode),
+      detail: buildOfflineAnalysisDetailSnapshot({
+        state: state,
+        builder: builder,
+        mode: mode,
+        materialType: materialType,
+        taskName: taskName,
+        selectedAlgorithms: selectedAlgorithms,
+        selectedRecipients: selectedRecipients,
+        selectedSpec: selectedSpec,
+        algorithmConfigs: algorithmConfigs,
+        materials: materials,
+        submittedAt: formatTimestamp(now)
+      })
+    };
+  }
+
+  function buildOfflineAnalysisActionItems(mode) {
+    if (mode === "start") {
+      return [
+        { label: "详情", className: "offline-action-link", toastTitle: "离线任务详情", toastMessage: "当前原型预留 {{batchNo}} 的详情入口。" },
+        { label: "暂停", className: "offline-action-link", toastTitle: "暂停分析", toastMessage: "当前原型模拟暂停 {{batchNo}}。" },
+        { label: "删除", className: "offline-action-link offline-action-link-danger", toastTitle: "删除任务", toastMessage: "当前原型模拟删除 {{batchNo}}。" }
+      ];
+    }
+
+    return [
+      { label: "详情", className: "offline-action-link", toastTitle: "离线任务详情", toastMessage: "当前原型预留 {{batchNo}} 的详情入口。" },
+      { label: "启动", className: "offline-action-link offline-action-link-primary", toastTitle: "启动分析", toastMessage: "当前原型模拟启动 {{batchNo}}。" },
+      { label: "删除", className: "offline-action-link offline-action-link-danger", toastTitle: "删除任务", toastMessage: "当前原型模拟删除 {{batchNo}}。" }
+    ];
+  }
+
+  function buildOfflineAnalysisDetailSnapshot(context) {
+    const state = context.state;
+    const builder = context.builder;
+    const selectedSpec = context.selectedSpec;
+    const materials = ensureList(context.materials);
+    const selectedRecipients = ensureList(context.selectedRecipients);
+    const selectedAlgorithms = ensureList(context.selectedAlgorithms);
+    const algorithmConfigs = context.algorithmConfigs || {};
+
+    return {
+      taskName: context.taskName,
+      inputTypeLabel: resolveOfflineInputTypeLabel(materials),
+      materialTypeLabel: resolveOfflineMaterialTypeLabel(builder, context.materialType),
+      fileCount: formatOfflineTaskFileCount(materials.length, context.materialType),
+      priorityLabel: resolveOfflinePriorityLabel(builder, state.priority),
+      executionModeLabel: context.mode === "start" ? "立即启动" : "草稿保存",
+      submittedAt: context.submittedAt,
+      algorithmDetails: selectedAlgorithms.map(function (algorithm) {
+        const config = algorithmConfigs[algorithm.key] || {};
+        const algorithmMaterials = ensureList(config.materials);
+        return {
+          key: algorithm.key,
+          label: algorithm.label || algorithm.name || "--",
+          version: config.version || "V1.0",
+          intervalLabel: normalizeOfflineInterval(config.interval || "5") + "秒",
+          materialCountLabel: formatOfflineTaskFileCount(algorithmMaterials.length, context.materialType),
+          materialNames: algorithmMaterials.slice(0, 6).map(function (item) {
+            return item.name || "--";
+          })
+        };
+      }),
+      resourceSpec: selectedSpec ? {
+        label: selectedSpec.label || "--",
+        meta: selectedSpec.meta || "",
+        vcpu: selectedSpec.vcpu || "--",
+        memoryGB: selectedSpec.memoryGB || "--",
+        gpu: selectedSpec.gpu || "--",
+        gpuMemoryGB: selectedSpec.gpuMemoryGB || "--",
+        diskGB: selectedSpec.diskGB || "--"
+      } : null,
+      recipients: selectedRecipients.map(function (recipient) {
+        return {
+          label: recipient.label || recipient.name || "--",
+          url: recipient.url || "--",
+          bindTask: recipient.bindTask || "--",
+          status: recipient.status || "--"
+        };
+      }),
+      materials: materials.map(function (item) {
+        return {
+          name: item.name || "--",
+          sourceLabel: resolveOfflineMaterialSourceLabel(item),
+          cover: item.cover || "--",
+          duration: item.duration || "--",
+          resolution: item.resolution || "--",
+          size: item.size || "--",
+          statusLabel: item.statusLabel || "--"
+        };
+      })
+    };
+  }
+
+  function loadOfflineAnalysisSeed(page) {
+    if (page.__offlineAnalysisSeedPromise) {
+      return page.__offlineAnalysisSeedPromise;
+    }
+
+    if (typeof window.loadPrototypePage === "function") {
+      page.__offlineAnalysisSeedPromise = Promise.resolve(window.loadPrototypePage(OFFLINE_ANALYSIS_PAGE_KEY)).then(function (seedPage) {
+        return seedPage || {
+          key: OFFLINE_ANALYSIS_PAGE_KEY,
+          offlineTaskPage: { rows: [] }
+        };
+      }).catch(function () {
+        return {
+          key: OFFLINE_ANALYSIS_PAGE_KEY,
+          offlineTaskPage: { rows: [] }
+        };
+      });
+      return page.__offlineAnalysisSeedPromise;
+    }
+
+    page.__offlineAnalysisSeedPromise = Promise.resolve({
+      key: OFFLINE_ANALYSIS_PAGE_KEY,
+      offlineTaskPage: { rows: [] }
+    });
+    return page.__offlineAnalysisSeedPromise;
   }
 
   function normalizeOfflineBuilder(page) {
@@ -1009,6 +1408,26 @@
     return state.algorithmConfigs;
   }
 
+  function collectOfflineTaskMaterials(state, builder) {
+    const configs = ensureOfflineAlgorithmConfigs(state, builder);
+    const lookup = {};
+    const materials = [];
+
+    ensureList(state.selectedAlgorithms).forEach(function (algorithmKey) {
+      const config = configs[algorithmKey] || {};
+      ensureList(config.materials).forEach(function (item) {
+        const fingerprint = item && (item.fingerprint || item.key);
+        if (!fingerprint || lookup[fingerprint]) {
+          return;
+        }
+        lookup[fingerprint] = true;
+        materials.push(item);
+      });
+    });
+
+    return materials;
+  }
+
   function resolveOfflineAlgorithmTabTemplate(builder, algorithm, index) {
     const tabs = ensureList(builder.tabs);
     return findByKey(tabs, algorithm.key) ||
@@ -1047,6 +1466,264 @@
 
     config.materials = materials;
     return { added: added, skipped: skipped };
+  }
+
+  function appendOfflineMaterialsFromLocalVideoRows(state, builder, algorithmKey, rows) {
+    const configs = ensureOfflineAlgorithmConfigs(state, builder);
+    const config = configs[algorithmKey] || {
+      version: "V1.0",
+      interval: "5",
+      materials: []
+    };
+    configs[algorithmKey] = config;
+    const materials = ensureList(config.materials);
+    const existingMap = createLookupMap(materials.map(function (item) {
+      return item.fingerprint;
+    }));
+    let added = 0;
+    let skipped = 0;
+
+    ensureList(rows).forEach(function (row) {
+      getLocalVideoMediaFilesFromRow(row).forEach(function (mediaFile, index) {
+        const material = buildOfflineMaterialFromLocalVideo(row, mediaFile, index);
+        if (!material || existingMap[material.fingerprint]) {
+          skipped += 1;
+          return;
+        }
+        existingMap[material.fingerprint] = true;
+        materials.push(material);
+        added += 1;
+      });
+    });
+
+    config.materials = materials;
+    return { added: added, skipped: skipped };
+  }
+
+  function getOfflineLocalVideoRows(page, materialType) {
+    return ensureList(page && page.__offlineLocalVideoRows).filter(function (row) {
+      if (!row) {
+        return false;
+      }
+      if (!materialType) {
+        return true;
+      }
+      return (row.fileType || "video") === materialType;
+    });
+  }
+
+  function loadOfflineLocalVideoRows(runtime, page) {
+    return loadOfflineLocalVideoSeed(page).then(function (seedPage) {
+      const currentPage = runtime.mockStore && typeof runtime.mockStore.getPage === "function"
+        ? runtime.mockStore.getPage(LOCAL_VIDEO_PAGE_KEY, seedPage)
+        : (seedPage || {});
+      const rows = ensureList(currentPage && currentPage.offlineTaskPage && currentPage.offlineTaskPage.rows).slice();
+      page.__offlineLocalVideoRows = rows;
+      return rows;
+    }).catch(function () {
+      page.__offlineLocalVideoRows = [];
+      return [];
+    });
+  }
+
+  function loadOfflineLocalVideoSeed(page) {
+    if (page.__offlineLocalVideoSeedPromise) {
+      return page.__offlineLocalVideoSeedPromise;
+    }
+
+    if (typeof window.loadPrototypePage === "function") {
+      page.__offlineLocalVideoSeedPromise = Promise.resolve(window.loadPrototypePage(LOCAL_VIDEO_PAGE_KEY)).then(function (seedPage) {
+        return seedPage || {
+          key: LOCAL_VIDEO_PAGE_KEY,
+          offlineTaskPage: { rows: [] }
+        };
+      }).catch(function () {
+        return {
+          key: LOCAL_VIDEO_PAGE_KEY,
+          offlineTaskPage: { rows: [] }
+        };
+      });
+      return page.__offlineLocalVideoSeedPromise;
+    }
+
+    page.__offlineLocalVideoSeedPromise = Promise.resolve({
+      key: LOCAL_VIDEO_PAGE_KEY,
+      offlineTaskPage: { rows: [] }
+    });
+    return page.__offlineLocalVideoSeedPromise;
+  }
+
+  function syncUploadedFilesToLocalVideo(runtime, page, files) {
+    const mediaFiles = ensureList(files).map(buildLocalVideoMediaFileFromFile).filter(Boolean);
+    if (!mediaFiles.length) {
+      return Promise.resolve({ added: 0, rows: ensureList(page.__offlineLocalVideoRows).slice() });
+    }
+
+    return loadOfflineLocalVideoSeed(page).then(function (seedPage) {
+      const currentPage = runtime.mockStore && typeof runtime.mockStore.getPage === "function"
+        ? runtime.mockStore.getPage(LOCAL_VIDEO_PAGE_KEY, seedPage)
+        : (seedPage || {});
+      const rows = ensureList(currentPage && currentPage.offlineTaskPage && currentPage.offlineTaskPage.rows).slice();
+      const existingMap = {};
+      rows.forEach(function (row) {
+        if (row && row.uploadFingerprint) {
+          existingMap[row.uploadFingerprint] = true;
+        }
+        getLocalVideoMediaFilesFromRow(row).forEach(function (item) {
+          if (item.fingerprint) {
+            existingMap[item.fingerprint] = true;
+          }
+        });
+      });
+
+      const createdAt = formatTimestamp(new Date());
+      let added = 0;
+      mediaFiles.forEach(function (mediaFile) {
+        if (!mediaFile.fingerprint || existingMap[mediaFile.fingerprint]) {
+          return;
+        }
+        existingMap[mediaFile.fingerprint] = true;
+        rows.unshift(buildLocalVideoRowFromMediaFile(mediaFile, createdAt));
+        added += 1;
+      });
+
+      if (runtime.mockStore && typeof runtime.mockStore.patchPage === "function") {
+        runtime.mockStore.patchPage(LOCAL_VIDEO_PAGE_KEY, {
+          offlineTaskPage: {
+            rows: rows
+          }
+        }, seedPage);
+      }
+
+      page.__offlineLocalVideoRows = rows.slice();
+      return { added: added, rows: rows };
+    });
+  }
+
+  function buildLocalVideoMediaFileFromFile(file) {
+    if (!file || !file.name) {
+      return null;
+    }
+
+    const mimeType = String(file.type || "");
+    const isVideo = mimeType.indexOf("video/") === 0;
+    const isImage = mimeType.indexOf("image/") === 0;
+
+    if (!isVideo && !isImage) {
+      return null;
+    }
+
+    return {
+      key: "local-media-" + Date.now() + "-" + Math.floor(Math.random() * 100000),
+      name: file.name,
+      kind: isImage ? "image" : "video",
+      size: Number(file.size) || 0,
+      sizeLabel: formatOfflineFileSize(file.size),
+      duration: isVideo ? "待解析" : "--",
+      resolution: "待解析",
+      fingerprint: [file.name, file.size, file.lastModified].join("|")
+    };
+  }
+
+  function buildLocalVideoRowFromMediaFile(mediaFile, createdAt) {
+    const isImage = mediaFile.kind === "image";
+    return {
+      id: "local-video-" + Date.now() + "-" + Math.floor(Math.random() * 100000),
+      recordName: stripFileExtension(mediaFile.name || (isImage ? "图片素材" : "视频素材")),
+      fileType: isImage ? "image" : "video",
+      fileTypeTone: isImage ? "file-image" : "file-video",
+      fileTypeLabel: isImage ? "图片" : "视频",
+      fileCount: "1",
+      remark: LOCAL_VIDEO_SYNC_REMARK,
+      createdAt: createdAt,
+      uploadFingerprint: mediaFile.fingerprint,
+      mediaFiles: [mediaFile],
+      actionItems: [
+        { label: "预览", className: "local-video-action local-video-action-preview" },
+        { label: "删除", className: "local-video-action local-video-action-delete" }
+      ]
+    };
+  }
+
+  function getLocalVideoMediaFilesFromRow(row) {
+    if (row && Array.isArray(row.mediaFiles) && row.mediaFiles.length) {
+      return row.mediaFiles.map(function (item, index) {
+        const kind = item && item.kind === "image" ? "image" : "video";
+        return {
+          key: item.key || ((row.id || "row") + "-media-" + index),
+          name: item.name || row.recordName || "未命名文件",
+          kind: kind,
+          size: Number(item.size) || 0,
+          sizeLabel: item.sizeLabel || formatOfflineFileSize(item.size),
+          duration: item.duration || (kind === "video" ? "待解析" : "--"),
+          resolution: item.resolution || "待解析",
+          fingerprint: item.fingerprint || [row.id || "row", kind, index].join("|")
+        };
+      });
+    }
+
+    const count = Math.max(1, parseInt(row && row.fileCount, 10) || 0);
+    const kind = row && row.fileType === "image" ? "image" : "video";
+    const baseName = row && row.recordName ? row.recordName : (kind === "image" ? "图片素材" : "视频素材");
+    const extension = kind === "image" ? ".jpg" : ".mp4";
+    const list = [];
+
+    for (var index = 0; index < count; index += 1) {
+      list.push({
+        key: (row && row.id || "row") + "-media-" + index,
+        name: count === 1 ? baseName + extension : (baseName + "-" + (index + 1) + extension),
+        kind: kind,
+        size: 0,
+        sizeLabel: "--",
+        duration: kind === "video" ? "待解析" : "--",
+        resolution: "待解析",
+        fingerprint: ["local-video", row && row.id || "row", index].join("|")
+      });
+    }
+
+    return list;
+  }
+
+  function buildOfflineMaterialFromLocalVideo(row, mediaFile, index) {
+    if (!row || !mediaFile) {
+      return null;
+    }
+
+    const isImage = mediaFile.kind === "image";
+    return {
+      key: "material-" + Date.now() + "-" + Math.floor(Math.random() * 100000),
+      fingerprint: ["local-video", row.id || "row", mediaFile.fingerprint || index].join("|"),
+      name: mediaFile.name || row.recordName || "未命名素材",
+      cover: isImage ? "图片文件" : "本地视频",
+      duration: isImage ? "--" : (mediaFile.duration || "待解析"),
+      resolution: mediaFile.resolution || "待解析",
+      size: mediaFile.sizeLabel || formatOfflineFileSize(mediaFile.size),
+      statusTone: "success",
+      statusLabel: "已选择"
+    };
+  }
+
+  function stripFileExtension(filename) {
+    const text = String(filename || "");
+    const dotIndex = text.lastIndexOf(".");
+    if (dotIndex <= 0) {
+      return text;
+    }
+    return text.slice(0, dotIndex);
+  }
+
+  function formatTimestamp(date) {
+    const value = date instanceof Date ? date : new Date();
+    return value.getFullYear() + "-" +
+      padNumber(value.getMonth() + 1) + "-" +
+      padNumber(value.getDate()) + " " +
+      padNumber(value.getHours()) + ":" +
+      padNumber(value.getMinutes()) + ":" +
+      padNumber(value.getSeconds());
+  }
+
+  function padNumber(value) {
+    return value < 10 ? "0" + value : String(value);
   }
 
   function buildOfflineMaterialFromFile(file) {
@@ -1099,6 +1776,106 @@
       return (bytes / 1024).toFixed(2) + " KB";
     }
     return bytes + " B";
+  }
+
+  function normalizeOfflineInterval(value) {
+    const text = String(value || "").replace(/[^\d]/g, "");
+    return text || "1";
+  }
+
+  function resolveOfflineInputTypeLabel(materials) {
+    const hasLocalVideo = ensureList(materials).some(function (item) {
+      return String(item && item.fingerprint || "").indexOf("local-video|") === 0;
+    });
+    const hasUpload = ensureList(materials).some(function (item) {
+      return String(item && item.fingerprint || "").indexOf("local-video|") !== 0;
+    });
+
+    if (hasLocalVideo && hasUpload) {
+      return "混合导入";
+    }
+    if (hasLocalVideo) {
+      return "从本地视频选择";
+    }
+    return "本地上传";
+  }
+
+  function resolveOfflineMaterialSourceLabel(material) {
+    if (String(material && material.fingerprint || "").indexOf("local-video|") === 0) {
+      return "本地视频";
+    }
+    return "本地上传";
+  }
+
+  function resolveOfflineMaterialTypeLabel(builder, materialType) {
+    const option = findByKey(builder.materialTypes, materialType);
+    return option && option.label ? option.label : (materialType === "image" ? "图片" : "视频");
+  }
+
+  function resolveOfflinePriorityLabel(builder, priorityKey) {
+    const option = findByKey(builder.priorityOptions, priorityKey);
+    return option && option.label ? option.label : "--";
+  }
+
+  function formatOfflineTaskFileCount(count, materialType) {
+    const total = Math.max(0, Number(count) || 0);
+    if (materialType === "image") {
+      return total + "张";
+    }
+    return total + "个文件";
+  }
+
+  function buildOfflineDraftTaskName(date) {
+    return "离线分析草稿-" + formatCompactTimestamp(date);
+  }
+
+  function buildOfflineTaskRecordId(date) {
+    return "offline-" + formatCompactTimestamp(date) + "-" + Math.floor(Math.random() * 1000);
+  }
+
+  function buildOfflineBatchNo(date) {
+    return "OFF-" + formatDateToken(date) + "-" + formatTimeToken(date);
+  }
+
+  function formatCompactTimestamp(date) {
+    const value = date instanceof Date ? date : new Date();
+    return formatDateToken(value) + formatTimeToken(value);
+  }
+
+  function formatDateToken(date) {
+    const value = date instanceof Date ? date : new Date();
+    return value.getFullYear() + padNumber(value.getMonth() + 1) + padNumber(value.getDate());
+  }
+
+  function formatTimeToken(date) {
+    const value = date instanceof Date ? date : new Date();
+    return padNumber(value.getHours()) + padNumber(value.getMinutes()) + padNumber(value.getSeconds());
+  }
+
+  function persistOfflineTaskState(runtime, page, state) {
+    if (!runtime || !runtime.mockStore || typeof runtime.mockStore.patchPage !== "function" || !page) {
+      return;
+    }
+
+    runtime.mockStore.patchPage(page.key, {
+      __offlineTaskCreateState: state
+    }, page);
+  }
+
+  function scrollToOfflineMaterials(root) {
+    if (!root || typeof root.querySelector !== "function") {
+      return;
+    }
+
+    const materialTable = root.querySelector(".offline-material-table-wrap");
+    if (!materialTable || typeof materialTable.scrollIntoView !== "function") {
+      return;
+    }
+
+    materialTable.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
   }
 
   function syncOfflineBreadcrumb(runtime) {

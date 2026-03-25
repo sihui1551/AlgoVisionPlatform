@@ -52,9 +52,7 @@
       if (!Array.isArray(r.actionItems) || !r.actionItems.length) {
         r.actionItems = [{ label: "预览", className: "local-video-action local-video-action-preview" }, { label: "删除", className: "local-video-action local-video-action-delete" }];
       }
-      previews[r.id] = r.fileType === "image"
-        ? [{ name: "image-1.jpg", kind: "image", url: "", objectUrl: false }]
-        : [{ name: "test.mp4", kind: "video", url: "", objectUrl: false }, { name: "video.mp4", kind: "video", url: "", objectUrl: false }];
+      previews[r.id] = buildPreviewItemsForRow(r);
     });
 
     const modal = mountModal();
@@ -287,6 +285,7 @@
         fileCount: String(addDraft.files.length),
         remark: addDraft.remark || "--",
         createdAt: formatDateTime(new Date()),
+        mediaFiles: buildMediaFilesFromUploads(addDraft.files),
         actionItems: [{ label: "预览", className: "local-video-action local-video-action-preview" }, { label: "删除", className: "local-video-action local-video-action-delete" }]
       });
       page.offlineTaskPage.rows = taskPage.rows;
@@ -299,7 +298,7 @@
       if (!row) { showToast("记录不存在", "当前记录已失效，请刷新后重试。"); return; }
       pv.rowId = id;
       pv.title = row.recordName || "本地视频预览";
-      pv.list = Array.isArray(previews[id]) && previews[id].length ? previews[id] : (row.fileType === "image" ? [{ name: "image-1.jpg", kind: "image", url: "", objectUrl: false }] : [{ name: "test.mp4", kind: "video", url: "", objectUrl: false }]);
+      pv.list = Array.isArray(previews[id]) && previews[id].length ? previews[id] : buildPreviewItemsForRow(row);
       pv.active = 0;
       modal.pvTitle.textContent = pv.title;
       drawPreview();
@@ -345,6 +344,67 @@ function formatSize(bytes) {
   if (bytes < 1024 * 1024) { return (bytes / 1024).toFixed(1) + 'KB'; }
   if (bytes < 1024 * 1024 * 1024) { return (bytes / (1024 * 1024)).toFixed(1) + 'MB'; }
   return (bytes / (1024 * 1024 * 1024)).toFixed(2) + 'GB';
+}
+
+function buildMediaFilesFromUploads(files) {
+  return Array.prototype.slice.call(files || []).filter(Boolean).map(function (file, index) {
+    const mime = String(file.type || "");
+    const kind = mime.indexOf("image/") === 0 ? "image" : "video";
+    return {
+      key: "media-file-" + Date.now() + "-" + index,
+      name: file.name || ("未命名" + (kind === "image" ? "图片" : "视频")),
+      kind: kind,
+      size: Number(file.size) || 0,
+      sizeLabel: formatSize(file.size || 0),
+      fingerprint: [file.name || "unnamed", file.size || 0, file.lastModified || 0].join("|")
+    };
+  });
+}
+
+function getMediaFilesFromRow(row) {
+  if (row && Array.isArray(row.mediaFiles) && row.mediaFiles.length) {
+    return row.mediaFiles.map(function (item, index) {
+      const kind = item && item.kind === "image" ? "image" : "video";
+      return {
+        key: item.key || ("media-file-" + index),
+        name: item.name || ((row && row.recordName) || "未命名文件"),
+        kind: kind,
+        size: Number(item.size) || 0,
+        sizeLabel: item.sizeLabel || formatSize(Number(item.size) || 0),
+        fingerprint: item.fingerprint || [row && row.id || "row", index, item && item.name || ""].join("|")
+      };
+    });
+  }
+
+  const count = Math.max(1, parseInt(row && row.fileCount, 10) || 0);
+  const kind = row && row.fileType === "image" ? "image" : "video";
+  const baseName = row && row.recordName ? row.recordName : (kind === "image" ? "图片文件" : "视频文件");
+  const extension = kind === "image" ? ".jpg" : ".mp4";
+  const list = [];
+
+  for (var index = 0; index < count; index += 1) {
+    list.push({
+      key: (row && row.id || "row") + "-media-" + index,
+      name: count === 1 ? baseName + extension : (baseName + "-" + (index + 1) + extension),
+      kind: kind,
+      size: 0,
+      sizeLabel: "--",
+      fingerprint: [row && row.id || "row", kind, index].join("|")
+    });
+  }
+
+  return list;
+}
+
+function buildPreviewItemsForRow(row) {
+  return getMediaFilesFromRow(row).map(function (item) {
+    return {
+      name: item.name || "未命名文件",
+      kind: item.kind === "image" ? "image" : "video",
+      url: "",
+      objectUrl: false
+    };
+  });
 }
 
 function esc(v) {
