@@ -16,15 +16,16 @@
   background: #fff;
   color: #415b78;
   border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 12px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .access-source-tab.active {
-  border-color: #1f73f1;
-  background: #edf4ff;
-  color: #1f73f1;
+  border-color: var(--accent);
+  background: var(--brand-soft);
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -43,7 +44,8 @@
 }
 
 .access-source-filter-label {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 600;
   color: #5f748b;
   min-width: 56px;
 }
@@ -53,17 +55,11 @@
 }
 
 .access-source-refresh {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid #d6e0ea;
-  background: #fff;
   color: #56708a;
-  cursor: pointer;
 }
 
 .access-source-refresh:hover {
-  background: #f3f8ff;
+  color: var(--accent);
 }
 
 .access-source-table-shell table {
@@ -111,12 +107,7 @@
 }
 
 .access-source-action-link {
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #1f73f1;
-  cursor: pointer;
-  font-size: 13px;
+  font-weight: 600;
 }
 
 .access-source-action-link:hover {

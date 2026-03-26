@@ -12,17 +12,19 @@
     toolbarLayout: "actions-left",
     toolbarActions: [
       { label: "新建任务", action: "create", variant: "button" },
-      { label: "启动", action: "start", variant: "offline-toolbar-secondary" },
-      { label: "删除", action: "delete", variant: "offline-toolbar-danger" }
+      { label: "启动", action: "start", variant: "button-secondary offline-toolbar-start" },
+      { label: "删除", action: "delete", variant: "button-danger offline-toolbar-delete" }
     ],
     filters: {
       searchFirst: false,
+      searchLabel: "搜索",
       searchPlaceholder: "任务ID、任务名称",
       searchFields: ["batchNo", "taskName"],
       selects: [
         {
           key: "execution-status",
           field: "executionStatus",
+          label: "执行状态",
           options: [
             { value: "", label: "全部状态" },
             { value: "pending", label: "待启动" },
@@ -34,6 +36,7 @@
         {
           key: "material-type",
           field: "materialType",
+          label: "素材类型",
           options: [
             { value: "", label: "全部素材" },
             { value: "video", label: "视频" },
@@ -144,9 +147,6 @@
     page.offlineTaskPage.rows = taskPage.rows;
 
     const modal = mountDetailModal();
-    ensureLabel(key + "-search", "搜索");
-    ensureLabel(key + "-filter-execution-status", "执行状态");
-    ensureLabel(key + "-filter-material-type", "素材类型");
     refreshDecorate();
 
     document.addEventListener("click", onClickCapture, true);
@@ -156,6 +156,7 @@
       });
       observer.observe(runtime.mountNode, { childList: true, subtree: true });
     }
+    requestRefresh();
 
     return function cleanup() {
       document.removeEventListener("click", onClickCapture, true);
@@ -193,12 +194,12 @@
 
     function onClickCapture(event) {
       const target = event.target;
-      if (target.closest(".page-offline-analysis .offline-toolbar-secondary")) {
+      if (target.closest(".page-offline-analysis .offline-toolbar-start")) {
         eat(event);
         batchStart();
         return;
       }
-      if (target.closest(".page-offline-analysis .offline-toolbar-danger")) {
+      if (target.closest(".page-offline-analysis .offline-toolbar-delete")) {
         eat(event);
         batchDelete();
         return;
@@ -258,6 +259,10 @@
         Array.prototype.forEach.call(tr.querySelectorAll(".offline-action-link"), function (button) {
           button.removeAttribute("data-toast-title");
           button.removeAttribute("data-toast-message");
+          button.classList.add("table-action-link");
+          if (resolveActionKey(button.textContent) === "delete") {
+            button.classList.add("table-action-danger");
+          }
           if (rowId) {
             button.setAttribute("data-row-id", rowId);
           }
@@ -271,8 +276,8 @@
         setChecked(head, ids.length > 0 && ids.every(function (id) { return !!selected[id]; }));
       }
 
-      removeToastAttr(".page-offline-analysis .offline-toolbar-secondary");
-      removeToastAttr(".page-offline-analysis .offline-toolbar-danger");
+      removeToastAttr(".page-offline-analysis .offline-toolbar-start");
+      removeToastAttr(".page-offline-analysis .offline-toolbar-delete");
       syncToolbarButtons();
     }
 
@@ -331,7 +336,7 @@
         }
       }
 
-      Array.prototype.forEach.call(document.querySelectorAll(".page-offline-analysis .offline-toolbar-secondary"), function (button) {
+      Array.prototype.forEach.call(document.querySelectorAll(".page-offline-analysis .offline-toolbar-start"), function (button) {
         if (button.textContent.trim() === "启动分析") {
           button.textContent = "启动";
         }
@@ -367,20 +372,6 @@
         node.removeAttribute("data-toast-title");
         node.removeAttribute("data-toast-message");
       });
-    }
-
-    function ensureLabel(id, text) {
-      const node = document.getElementById(id);
-      if (!node || !node.parentNode) {
-        return;
-      }
-      if (node.previousElementSibling && node.previousElementSibling.classList.contains("offline-analysis-filter-label")) {
-        return;
-      }
-      const label = document.createElement("span");
-      label.className = "offline-analysis-filter-label";
-      label.textContent = text;
-      node.parentNode.insertBefore(label, node);
     }
 
     function setChecked(node, checked) {
@@ -428,8 +419,16 @@
 
     function syncToolbarButtons() {
       const count = Object.keys(selected).length;
-      const startButton = document.querySelector(".page-offline-analysis .offline-toolbar-secondary");
-      const deleteButton = document.querySelector(".page-offline-analysis .offline-toolbar-danger");
+      const startButton = document.querySelector(".page-offline-analysis .offline-toolbar-start, .page-offline-analysis .offline-toolbar-secondary");
+      const deleteButton = document.querySelector(".page-offline-analysis .offline-toolbar-delete, .page-offline-analysis .offline-toolbar-danger");
+      if (startButton) {
+        startButton.classList.add("button-secondary", "offline-toolbar-start");
+        startButton.classList.remove("offline-toolbar-secondary");
+      }
+      if (deleteButton) {
+        deleteButton.classList.add("button-danger", "offline-toolbar-delete");
+        deleteButton.classList.remove("offline-toolbar-danger");
+      }
       if (startButton) {
         startButton.textContent = count ? "启动(" + count + ")" : "启动";
       }
@@ -592,22 +591,22 @@ function normalizeOfflineTaskRow(row) {
 function buildOfflineAnalysisActionItems(status) {
   if (status === "running") {
     return [
-      { label: "详情", className: "offline-action-link" },
-      { label: "暂停", className: "offline-action-link offline-action-link-primary" },
-      { label: "删除", className: "offline-action-link offline-action-link-danger" }
+      { label: "详情", className: "offline-action-link table-action-link" },
+      { label: "暂停", className: "offline-action-link table-action-link" },
+      { label: "删除", className: "offline-action-link table-action-link table-action-danger offline-action-link-danger" }
     ];
   }
   if (status === "failed" || status === "completed") {
     return [
-      { label: "详情", className: "offline-action-link" },
-      { label: "重跑", className: "offline-action-link offline-action-link-primary" },
-      { label: "删除", className: "offline-action-link offline-action-link-danger" }
+      { label: "详情", className: "offline-action-link table-action-link" },
+      { label: "重跑", className: "offline-action-link table-action-link" },
+      { label: "删除", className: "offline-action-link table-action-link table-action-danger offline-action-link-danger" }
     ];
   }
   return [
-    { label: "详情", className: "offline-action-link" },
-    { label: "启动", className: "offline-action-link offline-action-link-primary" },
-    { label: "删除", className: "offline-action-link offline-action-link-danger" }
+    { label: "详情", className: "offline-action-link table-action-link" },
+    { label: "启动", className: "offline-action-link table-action-link" },
+    { label: "删除", className: "offline-action-link table-action-link table-action-danger offline-action-link-danger" }
   ];
 }
 

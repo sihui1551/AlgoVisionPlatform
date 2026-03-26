@@ -10,13 +10,14 @@
   emptyText: "暂无本地视频记录",
   offlineTaskPage: {
     toolbarActions: [
-      { label: "+ 添加", action: "add", variant: "local-video-toolbar-add" },
-      { label: "批量删除", action: "batch-delete", variant: "local-video-toolbar-delete" }
+      { label: "+ 添加", action: "add", variant: "button local-video-toolbar-add" },
+      { label: "批量删除", action: "batch-delete", variant: "button-danger local-video-toolbar-delete" }
     ],
     filters: {
+      searchLabel: "搜索",
       searchPlaceholder: "关键字",
       searchFields: ["recordName", "remark"],
-      selects: [{ key: "file-type", field: "fileType", options: [{ value: "", label: "全部" }, { value: "image", label: "图片" }, { value: "video", label: "视频" }] }]
+      selects: [{ key: "file-type", field: "fileType", label: "文件类型", options: [{ value: "", label: "全部" }, { value: "image", label: "图片" }, { value: "video", label: "视频" }] }]
     },
     pageSize: 10,
     tableColumns: [
@@ -29,8 +30,8 @@
       { key: "actions", label: "操作" }
     ],
     rows: [
-      { id: "local-video-001", recordName: "测试设备2", fileType: "image", fileTypeTone: "file-image", fileTypeLabel: "图片", fileCount: "5", remark: "--", createdAt: "2026-03-09 17:16:13", actionItems: [{ label: "预览", className: "local-video-action local-video-action-preview" }, { label: "删除", className: "local-video-action local-video-action-delete" }] },
-      { id: "local-video-002", recordName: "测试设备1", fileType: "video", fileTypeTone: "file-video", fileTypeLabel: "视频", fileCount: "2", remark: "--", createdAt: "2026-03-09 17:14:46", actionItems: [{ label: "预览", className: "local-video-action local-video-action-preview" }, { label: "删除", className: "local-video-action local-video-action-delete" }] }
+      { id: "local-video-001", recordName: "测试设备2", fileType: "image", fileTypeTone: "file-image", fileTypeLabel: "图片", fileCount: "5", remark: "--", createdAt: "2026-03-09 17:16:13", actionItems: [{ label: "预览", className: "table-action-link local-video-action local-video-action-preview" }, { label: "删除", className: "table-action-link table-action-danger local-video-action local-video-action-delete" }] },
+      { id: "local-video-002", recordName: "测试设备1", fileType: "video", fileTypeTone: "file-video", fileTypeLabel: "视频", fileCount: "2", remark: "--", createdAt: "2026-03-09 17:14:46", actionItems: [{ label: "预览", className: "table-action-link local-video-action local-video-action-preview" }, { label: "删除", className: "table-action-link table-action-danger local-video-action local-video-action-delete" }] }
     ]
   },
   setup: function (runtime) {
@@ -50,14 +51,12 @@
     }
     taskPage.rows.forEach(function (r) {
       if (!Array.isArray(r.actionItems) || !r.actionItems.length) {
-        r.actionItems = [{ label: "预览", className: "local-video-action local-video-action-preview" }, { label: "删除", className: "local-video-action local-video-action-delete" }];
+        r.actionItems = [{ label: "预览", className: "table-action-link local-video-action local-video-action-preview" }, { label: "删除", className: "table-action-link table-action-danger local-video-action local-video-action-delete" }];
       }
       previews[r.id] = buildPreviewItemsForRow(r);
     });
 
     const modal = mountModal();
-    ensureLabel(key + "-search", "搜索");
-    ensureLabel(key + "-filter-file-type", "文件类型");
     refreshDecorate();
 
     document.addEventListener("click", onClickCapture, true);
@@ -127,18 +126,9 @@
 
     function eat(event) { event.preventDefault(); event.stopPropagation(); }
 
-    function ensureLabel(id, text) {
-      const node = document.getElementById(id);
-      if (!node || !node.parentNode) { return; }
-      if (node.previousElementSibling && node.previousElementSibling.classList.contains("local-video-filter-label")) { return; }
-      const label = document.createElement("span");
-      label.className = "local-video-filter-label";
-      label.textContent = text;
-      node.parentNode.insertBefore(label, node);
-    }
-
     function refreshDecorate() {
       const tbody = document.getElementById(key + "-table-body");
+      syncToolbarSkin();
       syncBatchBtn();
       if (!tbody) { return; }
 
@@ -169,6 +159,25 @@
       removeToastAttr(".page-local-video .local-video-action-preview");
       removeToastAttr(".page-local-video .local-video-action-delete");
       syncBatchBtn();
+    }
+
+    function syncToolbarSkin() {
+      const addButton = document.querySelector(".page-local-video .local-video-toolbar-add");
+      const deleteButton = document.querySelector(".page-local-video .local-video-toolbar-delete");
+
+      if (addButton) {
+        addButton.classList.add("button");
+      }
+      if (deleteButton) {
+        deleteButton.classList.add("button-danger");
+      }
+
+      Array.prototype.forEach.call(document.querySelectorAll(".page-local-video .local-video-action-preview"), function (node) {
+        node.classList.add("table-action-link");
+      });
+      Array.prototype.forEach.call(document.querySelectorAll(".page-local-video .local-video-action-delete"), function (node) {
+        node.classList.add("table-action-link", "table-action-danger");
+      });
     }
 
     function removeToastAttr(sel) {

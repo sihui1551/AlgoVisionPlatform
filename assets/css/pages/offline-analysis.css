@@ -28,35 +28,15 @@
   min-width: 220px;
 }
 
-.offline-toolbar-secondary,
-.offline-toolbar-danger {
-  min-width: 98px;
-  height: 40px;
-  padding: 0 18px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.offline-toolbar-secondary {
-  background: #96a0af;
-}
-
-.offline-toolbar-danger {
-  background: #ff3b30;
-}
-
 .page-offline-analysis .button {
-  min-width: 98px;
-  height: 40px;
-  border-radius: 4px;
+  min-width: 104px;
 }
 
-.page-offline-analysis .button-secondary {
-  height: 40px;
-  border-radius: 4px;
+.page-offline-analysis .button-secondary,
+.page-offline-analysis .button-danger,
+.page-offline-analysis .offline-toolbar-start,
+.page-offline-analysis .offline-toolbar-delete {
+  min-width: 104px;
 }
 
 .page-offline-analysis .table-shell {
@@ -113,34 +93,17 @@
 }
 
 .page-offline-analysis .table-action.offline-action-link {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #2b64eb;
-  font-size: 13px;
-  border-radius: 0;
-}
-
-.page-offline-analysis .table-action.offline-action-link:hover {
-  background: transparent;
-  color: #1d4fd3;
-}
-
-.page-offline-analysis .table-action.offline-action-link-danger {
-  color: #ff4d4f;
-}
-
-.page-offline-analysis .table-action.offline-action-link-danger:hover {
-  color: #e23235;
+  font-weight: 600;
 }
 
 .page-offline-analysis .table-footer {
   padding-top: 18px;
 }
 
-.offline-analysis-filter-label {
+.page-offline-analysis .table-filter-label {
   color: #5c6f85;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .offline-analysis-modal-root {

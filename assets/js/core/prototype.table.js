@@ -332,41 +332,61 @@
     );
   }
 
-  function renderSourceTaskSelect(id, options) {
-    if (!Array.isArray(options) || !options.length) {
+  function renderSourceTaskFilterField(label, controlMarkup, extraClassName) {
+    if (!controlMarkup) {
       return "";
     }
 
     return (
+      '<div class="table-filter-group' + (extraClassName ? " " + utils.escapeAttribute(extraClassName) : "") + '">' +
+      (label ? '<span class="table-filter-label">' + utils.escapeHtml(label) + "</span>" : "") +
+      controlMarkup +
+      "</div>"
+    );
+  }
+
+  function renderSourceTaskSelect(id, filter) {
+    const options = filter && filter.options;
+    if (!Array.isArray(options) || !options.length) {
+      return "";
+    }
+
+    return renderSourceTaskFilterField(filter.label, (
       '<select id="' + utils.escapeAttribute(id) + '" class="filter-field">' +
       options.map(function (option) {
         return '<option value="' + utils.escapeAttribute(option.value) + '">' + utils.escapeHtml(option.label) + "</option>";
       }).join("") +
       "</select>"
+    ));
+  }
+
+  function renderSourceTaskSearch(page, taskPage) {
+    if (!(taskPage.filters && taskPage.filters.searchPlaceholder)) {
+      return "";
+    }
+
+    return renderSourceTaskFilterField(
+      taskPage.filters.searchLabel || "搜索",
+      '<input id="' + utils.escapeAttribute(page.key + "-search") + '" class="filter-field" type="search" placeholder="' +
+        utils.escapeAttribute(taskPage.filters.searchPlaceholder) + '" />',
+      "table-filter-group-search"
     );
   }
 
   function renderSourceTaskFilters(page, taskPage) {
     let markup = "";
     const filterConfigs = getTaskPageFilterConfigs(page, taskPage);
-    const renderSearch = function () {
-      if (!(taskPage.filters && taskPage.filters.searchPlaceholder)) {
-        return "";
-      }
-
-      return '<input id="' + utils.escapeAttribute(page.key + "-search") + '" class="filter-field" type="search" placeholder="' +
-        utils.escapeAttribute(taskPage.filters.searchPlaceholder) + '" />';
-    };
+    const searchMarkup = renderSourceTaskSearch(page, taskPage);
 
     if (taskPage.filters && taskPage.filters.searchFirst === false) {
       filterConfigs.forEach(function (filter) {
-        markup += renderSourceTaskSelect(page.key + "-filter-" + filter.key, filter.options);
+        markup += renderSourceTaskSelect(page.key + "-filter-" + filter.key, filter);
       });
-      markup += renderSearch();
+      markup += searchMarkup;
     } else {
-      markup += renderSearch();
+      markup += searchMarkup;
       filterConfigs.forEach(function (filter) {
-        markup += renderSourceTaskSelect(page.key + "-filter-" + filter.key, filter.options);
+        markup += renderSourceTaskSelect(page.key + "-filter-" + filter.key, filter);
       });
     }
 
@@ -387,10 +407,12 @@
   }
 
   function mapSourceTaskToolbarAction(page, action) {
+    const variant = action.variant || resolveSourceTaskToolbarVariant(action.action);
+
     if (action.action === "create") {
       return {
         label: action.label,
-        variant: action.variant || "button",
+        variant: variant,
         route: resolveCreateRoute(page.key),
         toastTitle: action.label,
         toastMessage: "跳转到新建任务页面。"
@@ -399,7 +421,7 @@
 
     return {
       label: action.label,
-      variant: action.variant || "button-secondary",
+      variant: variant,
       toastTitle: action.label,
       toastMessage: "当前原型仅保留 " + action.label + " 入口。"
     };
@@ -492,16 +514,19 @@
       return [
         {
           label: "详情",
+          className: "table-action-link",
           toastTitle: "详情",
           toastMessage: "当前为原型演示，详情入口后续可接入真实页面。"
         },
         {
           label: "禁用",
+          className: "table-action-link",
           toastTitle: "禁用",
           toastMessage: "当前为原型演示，禁用动作后续可接入真实流转。"
         },
         {
           label: "删除",
+          className: "table-action-link table-action-danger",
           toastTitle: "删除",
           toastMessage: "当前为原型演示，删除动作后续可接入真实流转。"
         }
@@ -670,7 +695,14 @@
 
   function getTaskPageFilterConfigs(page, taskPage) {
     if (taskPage && taskPage.filters && Array.isArray(taskPage.filters.selects) && taskPage.filters.selects.length) {
-      return taskPage.filters.selects;
+      return taskPage.filters.selects.map(function (filter) {
+        return {
+          key: filter.key,
+          field: filter.field,
+          label: filter.label || resolveSourceTaskFilterLabel(page, filter.key),
+          options: filter.options
+        };
+      });
     }
 
     const filters = [];
@@ -678,6 +710,7 @@
       filters.push({
         key: "task-status",
         field: "taskStatus",
+        label: taskPage.filters.taskStatusLabel || "任务状态",
         options: taskPage.filters.taskStatusOptions
       });
     }
@@ -685,10 +718,36 @@
       filters.push({
         key: "health-status",
         field: "healthStatus",
+        label: taskPage.filters.healthStatusLabel || "健康状态",
         options: taskPage.filters.healthStatusOptions
       });
     }
     return filters;
+  }
+
+  function resolveSourceTaskToolbarVariant(actionKey) {
+    if (actionKey === "create") {
+      return "button";
+    }
+    if (actionKey === "delete" || actionKey === "batch-delete") {
+      return "button-danger";
+    }
+    return "button-secondary";
+  }
+
+  function resolveSourceTaskFilterLabel(page, filterKey) {
+    const pageKey = page && page.key;
+    const filterLabels = {
+      "offline-analysis": {
+        "execution-status": "执行状态",
+        "material-type": "素材类型"
+      },
+      "local-video": {
+        "file-type": "文件类型"
+      }
+    };
+
+    return (filterLabels[pageKey] && filterLabels[pageKey][filterKey]) || "";
   }
 
   function renderSourceTaskHeaderCell(column) {

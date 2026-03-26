@@ -230,16 +230,18 @@ window.registerPrototypePage({
       {
         "label": "禁用",
         "action": "disable",
-        "variant": "offline-toolbar-secondary"
+        "variant": "button-secondary stream-toolbar-disable"
       },
       {
         "label": "删除",
         "action": "delete",
-        "variant": "offline-toolbar-danger"
+        "variant": "button-danger stream-toolbar-delete"
       }
     ],
     "filters": {
       "searchFirst": false,
+      "searchLabel": "搜索",
+      "taskStatusLabel": "任务状态",
       "taskStatusOptions": [
         {
           "value": "",
@@ -254,6 +256,7 @@ window.registerPrototypePage({
           "label": "已禁用"
         }
       ],
+      "healthStatusLabel": "健康状态",
       "healthStatusOptions": [
         {
           "value": "",
@@ -417,5 +420,70 @@ window.registerPrototypePage({
         "specLabel": "A30 x2"
       }
     ]
+  },
+  "setup": function (runtime) {
+    const page = runtime.page || {};
+    const streamTaskPage = page.streamTaskPage || {};
+    const mockStore = runtime.mockStore;
+    const key = page.key || "stream-analysis";
+
+    normalizeToolbarActions();
+    syncToolbarButtons();
+
+    if (runtime.mountNode) {
+      const observer = new MutationObserver(function () {
+        requestAnimationFrame(function () {
+          syncToolbarButtons();
+        });
+      });
+      observer.observe(runtime.mountNode, { childList: true, subtree: true });
+      return function () {
+        observer.disconnect();
+      };
+    }
+
+    function normalizeToolbarActions() {
+      if (!Array.isArray(streamTaskPage.toolbarActions)) {
+        return;
+      }
+
+      let changed = false;
+      streamTaskPage.toolbarActions.forEach(function (action) {
+        if (!action) {
+          return;
+        }
+        if (action.action === "disable" && action.variant !== "button-secondary stream-toolbar-disable") {
+          action.variant = "button-secondary stream-toolbar-disable";
+          changed = true;
+        }
+        if (action.action === "delete" && action.variant !== "button-danger stream-toolbar-delete") {
+          action.variant = "button-danger stream-toolbar-delete";
+          changed = true;
+        }
+      });
+
+      if (changed && mockStore && typeof mockStore.patchPage === "function") {
+        mockStore.patchPage(key, {
+          streamTaskPage: {
+            toolbarActions: streamTaskPage.toolbarActions
+          }
+        }, page);
+      }
+    }
+
+    function syncToolbarButtons() {
+      const disableButton = document.querySelector(".page-stream-analysis .stream-toolbar-disable, .page-stream-analysis .offline-toolbar-secondary");
+      const deleteButton = document.querySelector(".page-stream-analysis .stream-toolbar-delete, .page-stream-analysis .offline-toolbar-danger");
+
+      if (disableButton) {
+        disableButton.classList.add("button-secondary", "stream-toolbar-disable");
+        disableButton.classList.remove("offline-toolbar-secondary");
+      }
+
+      if (deleteButton) {
+        deleteButton.classList.add("button-danger", "stream-toolbar-delete");
+        deleteButton.classList.remove("offline-toolbar-danger");
+      }
+    }
   }
 });

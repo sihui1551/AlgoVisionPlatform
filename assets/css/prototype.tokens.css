@@ -23,12 +23,22 @@
   --text: #273446;
   --muted: #6f8095;
   --brand: #2d83f5;
+  --brand-hover: #225fdf;
   --brand-soft: #edf5ff;
   --accent: #2d83f5;
+  --accent-hover: #225fdf;
   --accent-soft: #5fb5ff;
   --danger: #ef7270;
+  --danger-strong: #ff4d4f;
+  --danger-hover: #e23235;
   --warning: #f2a85f;
   --success: #56bf94;
+  --control-height-md: 40px;
+  --control-radius-md: 6px;
+  --button-padding-x: 18px;
+  --button-font-size: 14px;
+  --table-body-font-size: 14px;
+  --table-action-font-size: 13px;
   --shadow: 0 6px 20px rgba(63, 97, 139, 0.06);
   --radius: 10px;
 }

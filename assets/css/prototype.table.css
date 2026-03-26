@@ -13,13 +13,29 @@
   align-items: center;
 }
 
+.table-filter-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.table-filter-label {
+  color: #5c6f85;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .filter-field {
   min-width: 180px;
   padding: 9px 12px;
+  min-height: var(--control-height-md);
   border-radius: 6px;
   border: 1px solid var(--line-strong);
   background: #fff;
   color: var(--text);
+  font-size: 14px;
 }
 
 .table-shell {
@@ -91,7 +107,6 @@ td {
   text-align: left;
   padding: 12px 14px;
   border-bottom: 1px solid #e7edf3;
-  font-size: 13px;
   white-space: nowrap;
 }
 
@@ -99,6 +114,11 @@ th {
   color: #556b83;
   font-size: 12px;
   font-weight: 700;
+}
+
+td {
+  color: var(--text);
+  font-size: var(--table-body-font-size);
 }
 
 tbody tr:hover {
@@ -150,6 +170,32 @@ tbody tr:hover {
 .table-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table-action.table-action-link {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: var(--table-action-font-size);
+  font-weight: 600;
+}
+
+.table-action.table-action-link:hover {
+  background: transparent;
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.table-action.table-action-danger {
+  color: var(--danger-strong);
+}
+
+.table-action.table-action-danger:hover {
+  color: var(--danger-hover);
 }
 
 .empty-state {

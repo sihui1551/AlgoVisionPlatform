@@ -62,7 +62,7 @@
 .page-gb-channel-list .gb-channel-filter-label {
   color: #273446;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
 }
 
@@ -74,7 +74,7 @@
   border-radius: 6px;
   background: #ffffff;
   color: #4a6078;
-  font-size: 13px;
+  font-size: 14px;
   box-shadow: none;
 }
 
@@ -87,21 +87,13 @@
 }
 
 .page-gb-channel-list .gb-channel-refresh {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #dce6f1;
-  border-radius: 999px;
-  background: #ffffff;
   color: #94a3b8;
   font-size: 18px;
   line-height: 1;
-  cursor: pointer;
 }
 
 .page-gb-channel-list .gb-channel-refresh:hover {
   color: #2d83f5;
-  border-color: #bfd5f2;
-  background: #f7fbff;
 }
 
 .page-gb-channel-list .gb-channel-table-shell {
@@ -120,14 +112,13 @@
 }
 
 .page-gb-channel-list thead {
-  background: #ffffff;
+  background: #f7faff;
 }
 
 .page-gb-channel-list th,
 .page-gb-channel-list td {
-  padding: 16px 14px;
+  padding: 14px 14px;
   border-bottom: 1px solid #edf2f8;
-  font-size: 13px;
   vertical-align: middle;
   white-space: nowrap;
 }
@@ -140,6 +131,7 @@
 
 .page-gb-channel-list td {
   color: #31465d;
+  font-size: 14px;
 }
 
 .page-gb-channel-list tbody tr:hover {
@@ -299,18 +291,7 @@
 }
 
 .page-gb-channel-list .gb-channel-action-link {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: #2d83f5;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.page-gb-channel-list .gb-channel-action-link:hover {
-  background: transparent;
-  color: #1d69d4;
+  font-weight: 600;
 }
 
 .page-gb-channel-list .gb-channel-action-separator {

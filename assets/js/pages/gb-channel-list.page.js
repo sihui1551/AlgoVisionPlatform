@@ -76,7 +76,7 @@
         renderSelect("gb-channel-stream-filter", channelPage.streamTypeFilterOptions || []) +
         "</label>" +
         "</div>" +
-        '<button id="gb-channel-refresh" class="gb-channel-refresh" type="button" aria-label="刷新" data-toast-title="刷新通道" data-toast-message="当前原型已刷新通道列表。">↻</button>' +
+        '<button id="gb-channel-refresh" class="button-icon gb-channel-refresh" type="button" aria-label="刷新" data-toast-title="刷新通道" data-toast-message="当前原型已刷新通道列表。">↻</button>' +
         "</div>" +
         '<div class="table-shell gb-channel-table-shell">' +
         "<table>" +
@@ -579,12 +579,12 @@
     const utils = window.PROTOTYPE_UTILS;
     return (
       '<div class="table-actions gb-channel-actions">' +
-      '<button class="table-action gb-channel-action-link" type="button" data-gb-channel-play="' + utils.escapeAttribute(row.id) + '">◉ 播放</button>' +
+      '<button class="table-action table-action-link gb-channel-action-link" type="button" data-gb-channel-play="' + utils.escapeAttribute(row.id) + '">◉ 播放</button>' +
       '<span class="gb-channel-action-separator">|</span>' +
-      '<button class="table-action gb-channel-action-link" type="button" data-route="gb-channel-edit">编辑</button>' +
+      '<button class="table-action table-action-link gb-channel-action-link" type="button" data-route="gb-channel-edit">编辑</button>' +
       '<span class="gb-channel-action-separator">|</span>' +
       '<div class="gb-channel-more-wrap">' +
-      '<button class="table-action gb-channel-action-link gb-channel-more-trigger" type="button" data-gb-channel-menu-trigger="' + utils.escapeAttribute(row.id) + '">更多 <span class="gb-channel-more-caret">∨</span></button>' +
+      '<button class="table-action table-action-link gb-channel-action-link gb-channel-more-trigger" type="button" data-gb-channel-menu-trigger="' + utils.escapeAttribute(row.id) + '">更多 <span class="gb-channel-more-caret">∨</span></button>' +
       "</div>" +
       "</div>"
     );

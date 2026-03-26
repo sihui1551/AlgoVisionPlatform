@@ -377,10 +377,12 @@
 }
 
 .button,
+.button-danger,
 .button-secondary,
 .button-link,
 .table-action,
-.tag-button {
+.tag-button,
+.button-icon {
   border: 1px solid transparent;
   border-radius: 8px;
   padding: 8px 14px;
@@ -388,14 +390,38 @@
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
+.button,
+.button-danger,
+.button-secondary {
+  min-height: var(--control-height-md);
+  padding: 0 var(--button-padding-x);
+  border-radius: var(--control-radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: var(--button-font-size);
+  font-weight: 600;
+  line-height: 1;
+}
+
 .button {
   background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
+  box-shadow: 0 8px 18px rgba(45, 131, 245, 0.16);
+}
+
+.button-danger {
+  background: var(--danger-strong);
+  border-color: var(--danger-strong);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(255, 77, 79, 0.14);
 }
 
 .button-secondary {
   background: #fff;
-  border-color: #d7e3f2;
+  border-color: var(--line-strong);
   color: #4d647d;
 }
 
@@ -403,6 +429,22 @@
   background: transparent;
   color: var(--accent);
   padding-inline: 0;
+}
+
+.button-icon {
+  width: var(--control-height-md);
+  min-width: var(--control-height-md);
+  height: var(--control-height-md);
+  padding: 0;
+  border-radius: 8px;
+  background: #fff;
+  border-color: var(--line);
+  color: #7b8ca1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .table-action,
@@ -415,15 +457,38 @@
 }
 
 .button:hover,
+.button-danger:hover,
 .button-secondary:hover,
 .button-link:hover,
 .table-action:hover,
-.tag-button:hover {
+.tag-button:hover,
+.button-icon:hover {
   background-color: #f3f8ff;
 }
 
-.button:hover {
-  background-color: #226fda;
+.button:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.button-danger:hover:not(:disabled) {
+  background-color: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+
+.button-secondary:hover:not(:disabled),
+.button-icon:hover:not(:disabled) {
+  border-color: #bdd2eb;
+  color: #35516f;
+}
+
+.button:disabled,
+.button-danger:disabled,
+.button-secondary:disabled,
+.button-icon:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+  box-shadow: none;
 }
 
 .content-grid {

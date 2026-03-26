@@ -49,47 +49,30 @@
   min-width: 220px;
 }
 
+.page-stream-analysis .table-filter-label {
+  color: #5c6f85;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .page-stream-analysis .table-toolbar .button,
 .page-stream-analysis .table-toolbar .button-secondary,
-.page-stream-analysis .table-toolbar .offline-toolbar-secondary,
-.page-stream-analysis .table-toolbar .offline-toolbar-danger {
-  min-width: 98px;
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 4px;
+.page-stream-analysis .table-toolbar .button-danger {
+  min-width: 104px;
   box-shadow: none;
-  font-weight: 700;
 }
 
 .page-stream-analysis .table-toolbar .toolbar-group:first-child .button,
-.page-stream-analysis .table-toolbar .toolbar-group:first-child .offline-toolbar-secondary,
-.page-stream-analysis .table-toolbar .toolbar-group:first-child .offline-toolbar-danger {
+.page-stream-analysis .table-toolbar .toolbar-group:first-child .button-danger {
   border: 0;
 }
 
-.page-stream-analysis .table-toolbar .button {
-  background: var(--accent);
-}
-
-.page-stream-analysis .table-toolbar .button:hover {
-  background: #225fdf;
-}
-
 .page-stream-analysis .table-toolbar .button-secondary {
-  border-color: #d7e3f2;
-  background: rgba(255, 255, 255, 0.92);
-  color: #45607d;
-}
-
-.page-stream-analysis .table-toolbar .offline-toolbar-secondary {
-  background: #96a0af;
-  color: #fff;
   box-shadow: none;
 }
 
-.page-stream-analysis .table-toolbar .offline-toolbar-danger {
-  background: #ff3b30;
-  color: #fff;
+.page-stream-analysis .table-toolbar .button-danger {
   box-shadow: none;
 }
 
@@ -121,7 +104,7 @@
 
 .page-stream-analysis td {
   color: #2b3d52;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .page-stream-analysis tbody tr {
@@ -142,27 +125,28 @@
   gap: 8px;
 }
 
-.page-stream-analysis .table-action {
+.page-stream-analysis .table-action.table-action-link {
   padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: #2b64eb;
+  color: var(--accent);
   font-size: 13px;
   font-weight: 600;
 }
 
-.page-stream-analysis .table-action:hover {
+.page-stream-analysis .table-action.table-action-link:hover {
   background: transparent;
-  color: #1d4fd3;
+  color: var(--accent-hover);
+  text-decoration: underline;
 }
 
-.page-stream-analysis .table-actions .table-action:last-child {
-  color: #ff4d4f;
+.page-stream-analysis .table-action.table-action-danger {
+  color: var(--danger-strong);
 }
 
-.page-stream-analysis .table-actions .table-action:last-child:hover {
-  color: #e23235;
+.page-stream-analysis .table-action.table-action-danger:hover {
+  color: var(--danger-hover);
 }
 
 .page-stream-analysis .table-footer {
