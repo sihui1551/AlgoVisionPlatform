@@ -1,0 +1,156 @@
+.page-image-analysis .content-grid {
+  align-content: start;
+}
+
+.page-image-analysis .panel {
+  padding: 18px 20px 14px;
+  border-radius: 14px;
+  border-color: #e2eaf4;
+  background: #fff;
+  box-shadow: none;
+}
+
+.page-image-analysis .table-toolbar {
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.page-image-analysis .toolbar-group {
+  gap: 10px;
+}
+
+.page-image-analysis .table-toolbar .toolbar-group:first-child {
+  flex: 0 0 auto;
+}
+
+.page-image-analysis .table-toolbar .toolbar-group:last-child {
+  flex: 1 1 auto;
+  justify-content: flex-end;
+}
+
+.page-image-analysis .filter-field {
+  min-width: 142px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 6px;
+  border-color: #d9e4f2;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.page-image-analysis #image-analysis-search {
+  min-width: 220px;
+}
+
+.page-image-analysis .table-filter-label {
+  color: #5c6f85;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.page-image-analysis .table-toolbar .button,
+.page-image-analysis .table-toolbar .button-secondary,
+.page-image-analysis .table-toolbar .button-danger {
+  min-width: 104px;
+  box-shadow: none;
+}
+
+.page-image-analysis .table-toolbar .toolbar-group:first-child .button,
+.page-image-analysis .table-toolbar .toolbar-group:first-child .button-danger {
+  border: 0;
+}
+
+.page-image-analysis .table-shell {
+  border: 1px solid #e2eaf4;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.page-image-analysis .table-shell table {
+  min-width: 1120px;
+}
+
+.page-image-analysis thead {
+  background: #f7faff;
+}
+
+.page-image-analysis th,
+.page-image-analysis td {
+  padding: 12px 14px;
+}
+
+.page-image-analysis th {
+  color: #556b83;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.page-image-analysis td {
+  color: #2b3d52;
+  font-size: 14px;
+}
+
+.page-image-analysis tbody tr:hover {
+  background: #f9fbff;
+}
+
+.page-image-analysis .status-pill {
+  min-width: 72px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.page-image-analysis .table-actions {
+  gap: 8px;
+}
+
+.page-image-analysis .table-action.table-action-link {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.page-image-analysis .table-action.table-action-link:hover {
+  background: transparent;
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.page-image-analysis .table-action.table-action-danger {
+  color: var(--danger-strong);
+}
+
+.page-image-analysis .table-action.table-action-danger:hover {
+  color: var(--danger-hover);
+}
+
+.page-image-analysis .table-footer {
+  margin-top: 0;
+  padding-top: 18px;
+  border-top: 1px solid #edf2f8;
+}
+
+.page-image-analysis .table-footer-count {
+  color: #6d8098;
+  font-size: 12px;
+}
+
+.page-image-analysis .pagination-button {
+  min-width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border-color: #d9e4f1;
+}

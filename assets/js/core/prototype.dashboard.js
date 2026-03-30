@@ -137,7 +137,7 @@
 
     function handleClick(event) {
       const target = event.target.closest(
-        "[data-task-action], [data-task-validity], [data-task-priority], [data-task-tab], [data-task-clip-toggle], " +
+        "[data-task-action], [data-task-validity], [data-task-priority], [data-task-input-mode], [data-task-tab], [data-task-clip-toggle], " +
         "[data-task-modal-close], [data-task-algo-panel], [data-task-algo-move], [data-task-algo-save], " +
         "[data-task-address-row-toggle], [data-task-address-save], [data-task-node-tab], [data-task-node-row-toggle], " +
         "[data-task-node-save], [data-task-spec-row-toggle], [data-task-spec-save], [data-task-schedule-plan], [data-task-schedule-save], " +
@@ -412,6 +412,12 @@
 
       if (target.hasAttribute("data-task-priority")) {
         draft.priority = target.getAttribute("data-task-priority") || draft.priority;
+        rerender();
+        return;
+      }
+
+      if (target.hasAttribute("data-task-input-mode")) {
+        draft.inputMode = target.getAttribute("data-task-input-mode") || draft.inputMode;
         rerender();
         return;
       }
@@ -703,6 +709,7 @@
       (builder.showClipToggle === false ? "" : renderTaskCreateField("告警视频片段", false, renderTaskClipToggle(draft), true)) +
       (builder.showNodeSelector === false ? "" : renderTaskCreateField("计算节点", false, renderTaskNodeSelector(builder, draft), true)) +
       (builder.showSpecSelector === false ? "" : renderTaskCreateField("计算资源配置", false, renderTaskSpecSelector(builder, draft), true)) +
+      (Array.isArray(builder.inputModes) && builder.inputModes.length ? renderTaskCreateField("输入方式", false, renderTaskInputModeSelector(builder, draft), true) : "") +
       "</div>" +
       '<section class="task-builder-stage">' +
       renderTaskBuilderTabs(selectedAlgorithms, draft.activeAlgorithmKey) +
@@ -990,6 +997,16 @@
     );
   }
 
+  function renderTaskInputModeSelector(builder, draft) {
+    return (
+      '<div class="task-inline-row">' +
+      ensureList(builder.inputModes).map(function (item) {
+        return renderTaskRadio(item.label, draft.inputMode === item.key, "data-task-input-mode", item.key);
+      }).join("") +
+      '</div>'
+    );
+  }
+
   function renderTaskNodeSelector(builder, draft) {
     const selected = findTaskBuilderItems(builder.nodePools, draft.nodeKeys);
     return (
@@ -1079,28 +1096,63 @@
   function renderTaskPointTable(page) {
     const state = ensureTaskCreateState(page);
     const streams = ensureList(state.taskPoints);
+    const builder = page.taskBuilder || {};
+    const pointTable = builder.pointTable || {};
+    const columns = ensureList(pointTable.columns).length ? pointTable.columns : [
+      { key: "name", label: "点位名称" },
+      { key: "url", label: "流地址" },
+      { key: "alertFilterLabel", label: "告警过滤" },
+      { key: "algorithmThreshold", label: "算法阈值" },
+      { key: "roiLabel", label: "ROI" },
+      { key: "statusLabel", label: "状态", type: "status", toneField: "statusTone", labelField: "statusLabel" },
+      { key: "actions", label: "操作", type: "actions" }
+    ];
     return (
       '<div class="task-stream-table">' +
       '<div class="task-stream-table-header">' +
-      '<div class="task-stream-table-title">分析点位</div>' +
-      '<div class="task-stream-table-actions"><button class="button-link" type="button" data-task-action="point-open">添加</button><button class="button-link" type="button" data-toast-title="删除点位" data-toast-message="请在点位行内执行删除。">删除</button></div>' +
+      '<div class="task-stream-table-title">' + utils.escapeHtml(pointTable.title || "分析点位") + '</div>' +
+      '<div class="task-stream-table-actions"><button class="button-link" type="button" data-task-action="point-open">' + utils.escapeHtml(pointTable.addLabel || "添加") + '</button><button class="button-link" type="button" data-toast-title="删除点位" data-toast-message="请在点位行内执行删除。">' + utils.escapeHtml(pointTable.deleteLabel || "删除") + '</button></div>' +
       '</div>' +
       '<div class="table-shell">' +
       '<table>' +
-      '<thead><tr><th>点位名称</th><th>流地址</th><th>告警过滤</th><th>算法阈值</th><th>ROI</th><th>状态</th><th>操作</th></tr></thead>' +
+      '<thead><tr>' +
+      columns.map(function (column) {
+        if (column.type === "select") {
+          return '<th class="table-select-cell"><button class="table-row-checkbox table-row-checkbox-head" type="button" aria-label="全选"></button></th>';
+        }
+        return "<th>" + utils.escapeHtml(column.label || "") + "</th>";
+      }).join("") +
+      '</tr></thead>' +
       '<tbody>' +
       streams.map(function (stream) {
-        return (
-          '<tr>' +
-          '<td>' + utils.escapeHtml(stream.name || '--') + '</td>' +
-          '<td class="source-wrap-text">' + utils.escapeHtml(stream.url || '--') + '</td>' +
-          '<td>' + utils.escapeHtml(stream.alertFilterEnabled === false ? '关闭' : '开启') + '</td>' +
-          '<td>' + utils.escapeHtml(stream.algorithmThreshold || '0.4,0.3,0.5') + '</td>' +
-          '<td>' + utils.escapeHtml(stream.roiLabel || '默认') + '</td>' +
-          '<td>' + shell.renderStatusPill(stream.statusTone || 'success', stream.statusLabel || '--') + '</td>' +
-          '<td><div class="table-actions"><button class="table-action" type="button" data-task-action="point-preview" data-task-key="' + utils.escapeAttribute(stream.id) + '">预览</button><button class="table-action" type="button" data-task-action="point-edit" data-task-key="' + utils.escapeAttribute(stream.id) + '">编辑</button><button class="table-action" type="button" data-task-action="point-delete" data-task-key="' + utils.escapeAttribute(stream.id) + '">删除</button></div></td>' +
-          '</tr>'
-        );
+        return '<tr>' + columns.map(function (column) {
+          if (column.type === "select") {
+            return '<td class="table-select-cell"><button class="table-row-checkbox" type="button" aria-label="' + utils.escapeAttribute(stream.name || "选择点位") + '"></button></td>';
+          }
+          if (column.type === "status") {
+            return "<td>" + shell.renderStatusPill(stream[column.toneField || "statusTone"] || "success", stream[column.labelField || "statusLabel"] || "--") + "</td>";
+          }
+          if (column.type === "thumbnail") {
+            return '<td><div class="task-point-thumbnail"><img src="' + utils.escapeAttribute(stream.previewImage || ((builder.pointAssets || {}).previewImage || "")) + '" alt="' + utils.escapeAttribute(stream.name || "") + '" /></div></td>';
+          }
+          if (column.type === "actions" || column.key === "actions") {
+            return '<td><div class="table-actions"><button class="table-action" type="button" data-task-action="point-preview" data-task-key="' + utils.escapeAttribute(stream.id) + '">预览</button><button class="table-action" type="button" data-task-action="point-edit" data-task-key="' + utils.escapeAttribute(stream.id) + '">编辑</button><button class="table-action" type="button" data-task-action="point-delete" data-task-key="' + utils.escapeAttribute(stream.id) + '">删除</button></div></td>';
+          }
+
+          let value = stream[column.key];
+          if (column.key === "alertFilterLabel") {
+            value = stream.alertFilterEnabled === false ? "关闭" : "开启";
+          }
+          if (column.key === "roiLabel") {
+            value = stream.roiLabel || "默认";
+          }
+          if (column.key === "algorithmThreshold") {
+            value = stream.algorithmThreshold || "0.4,0.3,0.5";
+          }
+
+          const content = utils.escapeHtml(value == null || value === "" ? "--" : value);
+          return "<td>" + (column.strong ? "<strong>" + content + "</strong>" : content) + "</td>";
+        }).join("") + '</tr>';
       }).join('') +
       '</tbody>' +
       '</table>' +
@@ -1361,9 +1413,9 @@
       '<div class="source-modal-layer open">' +
       '<button class="source-modal-mask" type="button" data-task-modal-close="point-picker" aria-label="关闭新增点位弹框"></button>' +
       '<section class="source-modal task-point-picker-modal" role="dialog" aria-modal="true">' +
-      '<div class="source-modal-header"><h3 class="source-modal-title">新增点位</h3><button class="source-modal-close" type="button" aria-label="关闭" data-task-modal-close="point-picker">×</button></div>' +
+      '<div class="source-modal-header"><h3 class="source-modal-title">' + utils.escapeHtml((((page.taskBuilder || {}).pointTable || {}).pickerTitle) || "新增点位") + '</h3><button class="source-modal-close" type="button" aria-label="关闭" data-task-modal-close="point-picker">×</button></div>' +
       '<div class="task-point-picker-body">' +
-      '<input class="source-form-control" type="search" data-task-point-search="true" value="' + utils.escapeAttribute(state.pointPicker.keyword || "") + '" placeholder="搜索点位名称" />' +
+      '<input class="source-form-control" type="search" data-task-point-search="true" value="' + utils.escapeAttribute(state.pointPicker.keyword || "") + '" placeholder="' + utils.escapeAttribute((((page.taskBuilder || {}).pointTable || {}).pickerSearchPlaceholder) || "搜索点位名称") + '" />' +
       '<div class="task-point-picker-list">' +
       (rows.length
         ? rows.map(function (item) {
@@ -1389,10 +1441,10 @@
       '<div class="source-modal-layer open">' +
       '<button class="source-modal-mask" type="button" data-task-modal-close="point-preview" aria-label="关闭点位预览弹框"></button>' +
       '<section class="source-modal task-point-preview-modal" role="dialog" aria-modal="true">' +
-      '<div class="source-modal-header"><h3 class="source-modal-title">视频预览</h3><button class="source-modal-close" type="button" aria-label="关闭" data-task-modal-close="point-preview">×</button></div>' +
+      '<div class="source-modal-header"><h3 class="source-modal-title">' + utils.escapeHtml((((page.taskBuilder || {}).pointTable || {}).previewTitle) || "视频预览") + '</h3><button class="source-modal-close" type="button" aria-label="关闭" data-task-modal-close="point-preview">×</button></div>' +
       '<div class="task-point-preview-body">' +
       '<div class="task-point-preview-frame"><img src="' + utils.escapeAttribute(point.previewImage || ((page.taskBuilder || {}).pointAssets || {}).previewImage || "") + '" alt="' + utils.escapeAttribute(point.name || "") + '" /></div>' +
-      '<div class="task-point-preview-meta"><strong>' + utils.escapeHtml(point.name || "--") + '</strong><div class="source-wrap-text">' + utils.escapeHtml(point.url || "--") + "</div></div>" +
+      '<div class="task-point-preview-meta"><strong>' + utils.escapeHtml(point.name || "--") + '</strong><div class="source-wrap-text">' + utils.escapeHtml(point.ip || point.url || "--") + "</div></div>" +
       "</div>" +
       '<div class="source-modal-footer"><button class="button-secondary" type="button" data-task-modal-close="point-preview">关闭</button></div>' +
       "</section>" +
@@ -1761,6 +1813,8 @@
     });
     const defaultNode = nodePools.length ? [nodePools[0].key] : [];
     const defaultSpec = resourceSpecs.length ? resourceSpecs[0].key : "";
+    const inputModes = ensureList(builder.inputModes);
+    const pointSeeds = ensureList(builder.points || builder.streams);
 
     page.__taskCreateState = {
       draft: {
@@ -1774,13 +1828,14 @@
         recipients: defaultRecipients,
         clipEnabled: builder.defaultClipEnabled !== false,
         nodeKeys: defaultNode,
-        specKey: defaultSpec
+        specKey: defaultSpec,
+        inputMode: builder.defaultInputMode || ((inputModes[0] || {}).key || "")
       },
       algorithmConfigs: {},
-      taskPoints: ensureList(builder.streams).map(function (item) {
+      taskPoints: pointSeeds.map(function (item) {
         return createTaskPointDraft(item);
       }),
-      pointCatalog: ensureList(builder.streams).map(function (item) {
+      pointCatalog: pointSeeds.map(function (item) {
         return createTaskPointDraft(item);
       }),
       algorithmModal: {
@@ -1940,6 +1995,7 @@
       id: item.id || "",
       name: item.name || "",
       url: item.url || "",
+      ip: item.ip || "",
       statusTone: item.statusTone || "success",
       statusLabel: item.statusLabel || "在线",
       alertFilterEnabled: item.alertFilterEnabled !== false,

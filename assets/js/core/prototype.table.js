@@ -413,7 +413,7 @@
       return {
         label: action.label,
         variant: variant,
-        route: resolveCreateRoute(page.key),
+        route: action.route || resolveCreateRoute(page.key),
         toastTitle: action.label,
         toastMessage: "跳转到新建任务页面。"
       };
@@ -510,6 +510,11 @@
   }
 
   function getSourceTaskRowActions(page) {
+    const taskPage = getSourceTaskPage(page);
+    if (taskPage && Array.isArray(taskPage.rowActions) && taskPage.rowActions.length) {
+      return taskPage.rowActions;
+    }
+
     if (page && page.key === "stream-analysis") {
       return [
         {
@@ -636,6 +641,9 @@
   function resolveCreateRoute(pageKey) {
     if (pageKey === "stream-analysis") {
       return "stream-task-create";
+    }
+    if (pageKey === "image-analysis") {
+      return "image-task-create";
     }
     if (pageKey === "offline-analysis") {
       return "offline-task-create";

@@ -12,6 +12,8 @@
 | `gb-channel-list` | 通道列表 | `pages/gb-channel-list.html` | `assets/js/pages/gb-channel-list.page.js` | `assets/css/pages/gb-channel-list.css` |
 | `gb-device-create` | 新增设备 | `pages/gb-device-create.html` | `assets/js/pages/gb-device-form.page.js` | `assets/css/pages/gb-device-form.css` |
 | `gb-device-edit` | 设备编辑 | `pages/gb-device-edit.html` | `assets/js/pages/gb-device-form.page.js` | `assets/css/pages/gb-device-form.css` |
+| `image-analysis` | 图片分析 | `pages/image-analysis.html` | `assets/js/pages/image-analysis.page.js` | `assets/css/pages/image-analysis.css` |
+| `image-task-create` | 新建图片分析任务 | `pages/image-task-create.html` | `assets/js/pages/image-task-create.page.js` | `assets/css/pages/image-task-create.css` |
 | `local-video` | 本地视频 | `pages/local-video.html` | `assets/js/pages/local-video.page.js` | `assets/css/pages/local-video.css` |
 | `offline-analysis` | 离线视图分析 | `pages/offline-analysis.html` | `assets/js/pages/offline-analysis.page.js` | `assets/css/pages/offline-analysis.css` |
 | `offline-task-create` | 新建离线视图分析任务 | `pages/offline-task-create.html` | `assets/js/pages/offline-task-create.page.js` | `assets/css/pages/offline-task-create.css` |

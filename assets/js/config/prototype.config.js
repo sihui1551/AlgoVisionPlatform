@@ -67,6 +67,10 @@
           "label": "视频流分析"
         },
         {
+          "key": "image-analysis",
+          "label": "图片分析"
+        },
+        {
           "key": "offline-analysis",
           "label": "离线视图分析"
         }
@@ -94,6 +98,11 @@
       "key": "stream-analysis",
       "file": "stream-analysis.html",
       "source": "../assets/js/pages/stream-analysis.page.js"
+    },
+    "image-analysis": {
+      "key": "image-analysis",
+      "file": "image-analysis.html",
+      "source": "../assets/js/pages/image-analysis.page.js"
     },
     "access-source": {
       "key": "access-source",
@@ -149,6 +158,11 @@
       "key": "stream-task-create",
       "file": "stream-task-create.html",
       "source": "../assets/js/pages/stream-task-create.page.js"
+    },
+    "image-task-create": {
+      "key": "image-task-create",
+      "file": "image-task-create.html",
+      "source": "../assets/js/pages/image-task-create.page.js"
     },
     "offline-analysis": {
       "key": "offline-analysis",
