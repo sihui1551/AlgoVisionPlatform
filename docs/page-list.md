@@ -5,6 +5,7 @@
 | 页面 Key | 页面标题 | HTML 入口 | 页面脚本 | 页面样式 |
 | --- | --- | --- | --- | --- |
 | `access-source` | 接入源管理 | `pages/access-source.html` | `assets/js/pages/access-source.page.js` | `assets/css/pages/access-source.css` |
+| `algorithm-management` | 算法管理 | `pages/algorithm-management.html` | `assets/js/pages/algorithm-management.page.js` | `assets/css/pages/algorithm-management.css` |
 | `cloud-record` | 云端录像 | `pages/cloud-record.html` | `assets/js/pages/cloud-record.page.js` | `assets/css/pages/cloud-record.css` |
 | `dashboard` | 仪表盘 | `pages/dashboard.html` | `assets/js/pages/dashboard.page.js` | `assets/css/pages/dashboard.css` |
 | `gb-channel-edit` | 编辑通道 | `pages/gb-channel-edit.html` | `assets/js/pages/gb-channel-form.page.js` | `assets/css/pages/gb-channel-form.css` |
@@ -14,6 +15,7 @@
 | `local-video` | 本地视频 | `pages/local-video.html` | `assets/js/pages/local-video.page.js` | `assets/css/pages/local-video.css` |
 | `offline-analysis` | 离线视图分析 | `pages/offline-analysis.html` | `assets/js/pages/offline-analysis.page.js` | `assets/css/pages/offline-analysis.css` |
 | `offline-task-create` | 新建离线视图分析任务 | `pages/offline-task-create.html` | `assets/js/pages/offline-task-create.page.js` | `assets/css/pages/offline-task-create.css` |
+| `platform-config` | 平台配置 | `pages/platform-config.html` | `assets/js/pages/platform-config.page.js` | `assets/css/pages/platform-config.css` |
 | `stream-analysis` | 视频流分析 | `pages/stream-analysis.html` | `assets/js/pages/stream-analysis.page.js` | `assets/css/pages/stream-analysis.css` |
 | `stream-proxy-create` | 新增代理拉流 | `pages/stream-proxy-create.html` | `assets/js/pages/stream-proxy-edit.page.js` | `assets/css/pages/stream-proxy-create.css` |
 | `stream-proxy-edit` | 编辑拉流代理信息 | `pages/stream-proxy-edit.html` | `assets/js/pages/stream-proxy-edit.page.js` | `assets/css/pages/stream-proxy-edit.css` |

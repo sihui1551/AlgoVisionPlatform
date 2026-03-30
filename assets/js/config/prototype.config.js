@@ -47,6 +47,17 @@
       ]
     },
     {
+      "key": "algorithm-group",
+      "label": "算法仓库",
+      "icon": "目录",
+      "children": [
+        {
+          "key": "algorithm-management",
+          "label": "算法管理"
+        }
+      ]
+    },
+    {
       "key": "task-group",
       "label": "任务管理",
       "icon": "目录",
@@ -58,6 +69,17 @@
         {
           "key": "offline-analysis",
           "label": "离线视图分析"
+        }
+      ]
+    },
+    {
+      "key": "system-group",
+      "label": "系统管理",
+      "icon": "目录",
+      "children": [
+        {
+          "key": "platform-config",
+          "label": "平台配置"
         }
       ]
     }
@@ -82,6 +104,11 @@
       "key": "local-video",
       "file": "local-video.html",
       "source": "../assets/js/pages/local-video.page.js"
+    },
+    "algorithm-management": {
+      "key": "algorithm-management",
+      "file": "algorithm-management.html",
+      "source": "../assets/js/pages/algorithm-management.page.js"
     },
     "cloud-record": {
       "key": "cloud-record",
@@ -132,6 +159,11 @@
       "key": "offline-task-create",
       "file": "offline-task-create.html",
       "source": "../assets/js/pages/offline-task-create.page.js"
+    },
+    "platform-config": {
+      "key": "platform-config",
+      "file": "platform-config.html",
+      "source": "../assets/js/pages/platform-config.page.js"
     }
   }
 };
