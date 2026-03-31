@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Video Preview Placeholder</title>
+  <desc id="desc">Placeholder artwork for stream preview cards and modals.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#123a5f" />
+      <stop offset="100%" stop-color="#245f94" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" rx="24" fill="url(#bg)" />
+  <circle cx="320" cy="180" r="72" fill="rgba(255,255,255,0.12)" />
+  <polygon points="300,145 300,215 360,180" fill="#ffffff" />
+  <text x="320" y="284" text-anchor="middle" font-size="28" font-family="Arial, sans-serif" fill="#ffffff">
+    Stream Preview
+  </text>
+</svg>

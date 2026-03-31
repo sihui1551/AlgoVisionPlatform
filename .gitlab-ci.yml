@@ -1,0 +1,16 @@
+image: node:20-alpine
+
+stages:
+  - deploy
+
+deploy-pages:
+  stage: deploy
+  script:
+    - node ./tools/build-pages.js
+  pages:
+    publish: public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  environment:
+    name: production
+    url: $CI_PAGES_URL

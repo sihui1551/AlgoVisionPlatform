@@ -1,157 +1,156 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-<head>
-    <title>Untitled Document</title>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <link type="text/css" href="resources/css/reset.css" rel="Stylesheet" />
-    <link type="text/css" href="resources/css/default.css" rel="Stylesheet" />
-    <link rel='icon' type='image/svg+xml' href='resources/images/favicon_play.svg' />
-    <link rel='alternate icon' href='resources/images/favicon_play.ico' />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600' rel='stylesheet'>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI视频算法调度平台</title>
+    <link href="./assets/css/prototype.css" type="text/css" rel="stylesheet" />
+    <style>
+      .prototype-home {
+        min-height: 100vh;
+        padding: 48px 24px;
+        background:
+          radial-gradient(circle at top right, rgba(45, 131, 245, 0.18), transparent 28%),
+          linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
+      }
 
-    <script type="text/javascript">
-        if (location.href.toString().indexOf('file://localhost/') == 0) {
-            location.href = location.href.toString().replace('file://localhost/', 'file:///');
-        }
-    </script>
-    <!--<link type="text/css" rel="Stylesheet" href="plugins/sitemap/styles/sitemap.css" />
-    <link type="text/css" rel="Stylesheet" href="plugins/page_notes/styles/page_notes.css" />
-    <link type="text/css" rel="Stylesheet" href="plugins/debug/styles/debug.css" />
-    <link type="text/css" rel="Stylesheet" href="plugins/handoff/styles/handoff.css" />
-    <link type="text/css" rel="Stylesheet" href="plugins/handoff/styles/codemirror.css" />-->
-</head>
-<body scroll="no" class="hashover" style="overflow: hidden;">
-    <div id="topPanel">
-        <div id="interfaceControlFrame">
-            <div id="interfaceControlFrameLeft">
-                <div id="interfaceControlFrameMinimizeContainer">
-                    <a title="Collapse" id="interfaceControlFrameMinimizeButton">
-                        <div id="minimizeArrow" class="minimizeButtonHover minimizeIcon"></div>
-                        <div id="minimizeX" class="minimizeButton minimizeIcon"></div>
-                    </a>
-                </div>
-                <div id="interfaceControlFrameCloseContainer">
-                    <a title="Close" id="interfaceControlFrameCloseButton">CLOSE</a>
-                </div>
+      .prototype-home__shell {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
 
-                <div id="sitemapControlFrameContainer" title="Project Pages">
-                    <div id="projectControlFrameHeaderContainer">
-                        <ul id="projectControlFrameHeader"></ul>
-                    </div>
+      .prototype-home__hero {
+        margin-bottom: 28px;
+      }
 
-                    <div id="interfacePageNameContainer">
-                        <div id="interfacePageNameButton" class='pageNameHeader'>
-                            &nbsp;
-                        </div>
-                        <div id="interfacePageCount" class='pageCountHeader'>
-                        </div>
-                    </div>
-                </div>
+      .prototype-home__eyebrow {
+        margin: 0 0 10px;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
 
+      .prototype-home__title {
+        margin: 0;
+        font-size: 40px;
+        line-height: 1.1;
+      }
 
-                <div id="interfaceAdaptiveViewsContainer" title="Adaptive Views">
-                    <div id="interfaceAdaptiveViewsIconButton">&nbsp;</div>
-                    <div id="interfaceAdaptiveViewsButton" class='adaptiveViewHeader'>
-                        &nbsp;
-                    </div>
-                    <div id="adaptiveViewsDropdown" class="caret"></div>
-                </div>
-            </div>
+      .prototype-home__summary {
+        max-width: 720px;
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.7;
+      }
 
-            <div id="interfaceControlFrameContainer">
-                <div id="handoffControlFrameHeaderContainer">
-                    <ul id="handoffControlFrameHeader"></ul>
-                </div>
-                <div id="interfaceControlFrameLogoContainer">
-                    <!--<div id="previewNotice">
-                        Local Preview
-                    </div>-->
-                </div>
-            </div>
+      .prototype-home__actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+      }
 
-            <div id="interfaceControlFrameRight">
-                <div id="publishContainer">
-                    <a id="publishButton">Share Prototype</a>
-                </div>
+      .prototype-home__button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 144px;
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 10px;
+        font-weight: 700;
+      }
 
-                <div id="scaleMenuButton" title="Zoom and Scale">
-                    <div id="scaleValue">100%</div>
-                    <div id="expandScaleArrow" class="caret"></div>
-                </div>
+      .prototype-home__button--primary {
+        background: var(--accent);
+        color: #fff;
+      }
 
-                <div id="inspectControlFrameHeaderContainer">
-                    <ul id="inspectControlFrameHeader">
-                        <li id="overflowBtn">
-                            <a id="overflowMenuButton" title="Options"></a>
-                        </li>
-                    </ul>
-                </div>
+      .prototype-home__button--secondary {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--text);
+      }
 
-                <div id="separatorContainer">
-                    <div class="separator"></div>
-                </div>
+      .prototype-home__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
 
-                <div id="overflowMadeWith"><a href="https://www.axure.com" id="axureLogo" target="_blank"></a></div>
+      .prototype-home__card {
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 36px rgba(39, 52, 70, 0.06);
+      }
 
-            </div>
+      .prototype-home__card h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
 
-        </div>
-    </div>
-    <div id="popupContainer">
-        <div id='interfaceAdaptiveViewsListContainer'>
-        </div>
+      .prototype-home__card p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
 
-        <div id='interfaceScaleListContainer'>
-        </div>
+      .prototype-home__card a {
+        color: var(--accent);
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="prototype-home">
+      <div class="prototype-home__shell">
+        <section class="prototype-home__hero">
+          <p class="prototype-home__eyebrow">Prototype Project</p>
+          <h1 class="prototype-home__title">AI视频算法调度平台</h1>
+          <p class="prototype-home__summary">
+            当前仓库已经切换到纯静态多页面原型结构。首页保留为项目入口页，业务页面统一收敛到
+            <code>pages/</code> 目录，共享资源收敛到 <code>assets/</code>。
+          </p>
+          <div class="prototype-home__actions">
+            <a class="prototype-home__button prototype-home__button--primary" href="./pages/dashboard.html">进入仪表盘</a>
+            <a class="prototype-home__button prototype-home__button--secondary" href="./pages/stream-analysis.html">查看任务管理</a>
+          </div>
+        </section>
 
-        <div id='overflowMenuContainer'>
-        </div>
-
-        <div id='scaleMenuContainer'>
-        </div>
-    </div>
-    <div id="outerContainer">
-        <div id="clippingBounds">
-            <div id="clippingBoundsScrollContainer"></div>
-        </div>
-
-        <div id="mHideSidebar"></div>
-        <div id="lsplitbar" class="splitbar"></div>
-        <div id="mainPanel">
-            <div id="mainPanelContainer" style="position: relative; width:100%; height: 100%;">
-                <div id="clipFrameScroll" style="position: relative; width:100%; height: 100%; background-color: #ffffff;">
-                    <iframe id="mainFrame" name="mainFrame" width="100%" height="100%" src="about:blank" frameborder="0" style="display: block;position:absolute;" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-                </div>
-            </div>
-        </div>
-
-        <div id="rsplitbar" class="splitbar"></div>
-    </div>
-
-    <div id="maximizePanelContainer" class="maximizePanelContainer">
-        <div id="maximizePanelOver">
-            <div id="maximizePanel" title="Expand" class="maximizePanelOver">
-                <div id="maximizeButton" class="maximizeButton maximizeIcon"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="mobileControlFrameContainer"></div>
-
-<!-- 11.0.0.4134 -->
-<script src="resources/scripts/jquery-3.7.1.min.js"></script>
-<script src="resources/scripts/axure/jquery.nicescroll.min.js"></script>
-<script src="resources/scripts/axutils.js"></script>
-<script src="resources/scripts/messagecenter.js"></script>
-<script src="resources/scripts/player/axplayer.js"></script>
-<script src="resources/scripts/player/init.js"></script>
-
-
-</body>
+        <section class="prototype-home__grid" aria-label="页面导航">
+          <article class="prototype-home__card">
+            <h2>仪表盘</h2>
+            <p>系统概览、告警统计和关键运营指标。</p>
+            <a href="./pages/dashboard.html">打开页面</a>
+          </article>
+          <article class="prototype-home__card">
+            <h2>接入管理</h2>
+            <p>接入源管理、本地视频、云端录像与代理编辑链路。</p>
+            <a href="./pages/access-source.html">打开接入源管理</a>
+          </article>
+          <article class="prototype-home__card">
+            <h2>任务管理</h2>
+            <p>视频流分析、离线分析与新建任务流程。</p>
+            <a href="./pages/stream-analysis.html">打开视频流分析</a>
+          </article>
+          <article class="prototype-home__card">
+            <h2>算法仓库</h2>
+            <p>算法资产、版本信息与分析源类型的统一管理入口。</p>
+            <a href="./pages/algorithm-management.html">打开算法管理</a>
+          </article>
+          <article class="prototype-home__card">
+            <h2>设备与通道</h2>
+            <p>设备新增、设备编辑、通道列表与通道编辑。</p>
+            <a href="./pages/gb-device-create.html">打开设备新增</a>
+          </article>
+        </section>
+      </div>
+    </main>
+  </body>
 </html>
