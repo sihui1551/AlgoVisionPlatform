@@ -13,11 +13,12 @@
 | `gb-device-create` | 新增设备 | `pages/gb-device-create.html` | `assets/js/pages/gb-device-form.page.js` | `assets/css/pages/gb-device-form.css` |
 | `gb-device-edit` | 设备编辑 | `pages/gb-device-edit.html` | `assets/js/pages/gb-device-form.page.js` | `assets/css/pages/gb-device-form.css` |
 | `image-analysis` | 图片分析 | `pages/image-analysis.html` | `assets/js/pages/image-analysis.page.js` | `assets/css/pages/image-analysis.css` |
-| `image-task-create` | 新建图片分析任务 | `pages/image-task-create.html` | `assets/js/pages/image-task-create.page.js` | `assets/css/pages/image-task-create.css` |
+| `image-task-create` | 新建任务 | `pages/image-task-create.html` | `assets/js/pages/image-task-create.page.js` | `assets/css/pages/image-task-create.css` |
 | `local-video` | 本地视频 | `pages/local-video.html` | `assets/js/pages/local-video.page.js` | `assets/css/pages/local-video.css` |
 | `offline-analysis` | 离线视图分析 | `pages/offline-analysis.html` | `assets/js/pages/offline-analysis.page.js` | `assets/css/pages/offline-analysis.css` |
 | `offline-task-create` | 新建离线视图分析任务 | `pages/offline-task-create.html` | `assets/js/pages/offline-task-create.page.js` | `assets/css/pages/offline-task-create.css` |
 | `platform-config` | 平台配置 | `pages/platform-config.html` | `assets/js/pages/platform-config.page.js` | `assets/css/pages/platform-config.css` |
+| `spec-management` | 规格管理 | `pages/spec-management.html` | `assets/js/pages/spec-management.page.js` | `assets/css/pages/spec-management.css` |
 | `stream-analysis` | 视频流分析 | `pages/stream-analysis.html` | `assets/js/pages/stream-analysis.page.js` | `assets/css/pages/stream-analysis.css` |
 | `stream-proxy-create` | 新增代理拉流 | `pages/stream-proxy-create.html` | `assets/js/pages/stream-proxy-edit.page.js` | `assets/css/pages/stream-proxy-create.css` |
 | `stream-proxy-edit` | 编辑拉流代理信息 | `pages/stream-proxy-edit.html` | `assets/js/pages/stream-proxy-edit.page.js` | `assets/css/pages/stream-proxy-edit.css` |

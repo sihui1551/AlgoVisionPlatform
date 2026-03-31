@@ -82,6 +82,10 @@
       "icon": "目录",
       "children": [
         {
+          "key": "spec-management",
+          "label": "规格管理"
+        },
+        {
           "key": "platform-config",
           "label": "平台配置"
         }
@@ -178,6 +182,11 @@
       "key": "platform-config",
       "file": "platform-config.html",
       "source": "../assets/js/pages/platform-config.page.js"
+    },
+    "spec-management": {
+      "key": "spec-management",
+      "file": "spec-management.html",
+      "source": "../assets/js/pages/spec-management.page.js"
     }
   }
 };

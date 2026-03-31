@@ -140,7 +140,7 @@
         "[data-task-action], [data-task-validity], [data-task-priority], [data-task-input-mode], [data-task-tab], [data-task-clip-toggle], " +
         "[data-task-modal-close], [data-task-algo-panel], [data-task-algo-move], [data-task-algo-save], " +
         "[data-task-address-row-toggle], [data-task-address-save], [data-task-node-tab], [data-task-node-row-toggle], " +
-        "[data-task-node-save], [data-task-spec-row-toggle], [data-task-spec-save], [data-task-schedule-plan], [data-task-schedule-save], " +
+        "[data-task-node-save], [data-task-spec-row-toggle], [data-task-spec-save], [data-task-schedule-plan], [data-task-schedule-save], [data-task-schedule-cell], " +
         "[data-task-point-row-toggle], [data-task-point-save], [data-task-point-edit-save]"
       );
       if (!target) {
@@ -338,6 +338,59 @@
           state.scheduleModal.open = true;
           state.scheduleModal.algorithmKey = key;
           state.scheduleModal.planKey = algorithmConfig.scheduleKey;
+          rerender();
+          return;
+        }
+
+        if (action === "schedule-copy") {
+          const sourceKey = target.getAttribute("data-task-key") || draft.activeAlgorithmKey;
+          const targetKeys = draft.selectedAlgorithms.filter(function (item) {
+            return item !== sourceKey;
+          });
+
+          if (!targetKeys.length) {
+            showToast("暂无可复制目标", "请至少再选择一个算法后再执行复制。");
+            return;
+          }
+
+          const sourceConfig = getTaskAlgorithmConfig(page, sourceKey);
+          targetKeys.forEach(function (key) {
+            const targetConfig = getTaskAlgorithmConfig(page, key);
+            targetConfig.scheduleKey = sourceConfig.scheduleKey;
+          });
+          showToast("复制成功", "已将当前分析时间时长复制至其他算法。");
+          rerender();
+          return;
+        }
+
+        if (action === "schedule-plan-new") {
+          const sourcePlan = findTaskBuilderItem((page.taskBuilder || {}).schedulePlans, state.scheduleModal.planKey);
+          const nextPlan = createTaskSchedulePlan((page.taskBuilder || {}).schedulePlans, sourcePlan);
+          page.taskBuilder.schedulePlans = ensureList((page.taskBuilder || {}).schedulePlans).concat([nextPlan]);
+          state.scheduleModal.planKey = nextPlan.key;
+          rerender();
+          return;
+        }
+
+        if (action === "schedule-plan-delete") {
+          const plan = findTaskBuilderItem((page.taskBuilder || {}).schedulePlans, state.scheduleModal.planKey);
+          if (plan && plan.locked) {
+            showToast("默认模板不可删除", "全天候和工作日计划暂不支持删除。");
+            return;
+          }
+
+          const builderSchedules = ensureList((page.taskBuilder || {}).schedulePlans);
+          page.taskBuilder.schedulePlans = builderSchedules.filter(function (item) {
+            return item.key !== state.scheduleModal.planKey;
+          });
+
+          const fallbackKey = (page.taskBuilder || {}).defaultScheduleKey || ((page.taskBuilder.schedulePlans[0] || {}).key || "");
+          Object.keys(state.algorithmConfigs).forEach(function (algorithmKey) {
+            if (state.algorithmConfigs[algorithmKey].scheduleKey === state.scheduleModal.planKey) {
+              state.algorithmConfigs[algorithmKey].scheduleKey = fallbackKey;
+            }
+          });
+          state.scheduleModal.planKey = fallbackKey;
           rerender();
           return;
         }
@@ -565,6 +618,23 @@
         return;
       }
 
+      if (target.hasAttribute("data-task-schedule-cell")) {
+        const plan = findTaskBuilderItem((page.taskBuilder || {}).schedulePlans, state.scheduleModal.planKey);
+        if (!plan || plan.locked) {
+          return;
+        }
+
+        const dayIndex = Number(target.getAttribute("data-task-day-index"));
+        const hour = Number(target.getAttribute("data-task-hour"));
+        if (Number.isNaN(dayIndex) || Number.isNaN(hour)) {
+          return;
+        }
+
+        toggleTaskScheduleHour(plan, dayIndex, hour);
+        rerender();
+        return;
+      }
+
       if (target.hasAttribute("data-task-point-row-toggle")) {
         const key = target.getAttribute("data-task-point-row-toggle");
         const index = state.pointPicker.selection.indexOf(key);
@@ -664,6 +734,15 @@
       const pointField = target.getAttribute("data-task-point-field");
       if (pointField && state.pointEditor.draft) {
         state.pointEditor.draft[pointField] = target.value || "";
+      }
+
+      const scheduleField = target.getAttribute("data-task-schedule-field");
+      if (scheduleField) {
+        const plan = findTaskBuilderItem((page.taskBuilder || {}).schedulePlans, state.scheduleModal.planKey);
+        if (plan && !plan.locked) {
+          plan[scheduleField] = target.value || "";
+          shouldRerender = true;
+        }
       }
 
       if (target.hasAttribute("data-task-point-search")) {
@@ -1069,12 +1148,15 @@
 
   function renderTaskBuilderBody(page, builder, algorithm) {
     const config = getTaskAlgorithmConfig(page, algorithm.key);
+    const scheduleMeta = isImageTaskPage(page)
+      ? renderTaskBuilderMeta('分析时间时长', renderTaskScheduleInlineActions(builder, algorithm, config), 'task-builder-meta-item-schedule')
+      : renderTaskBuilderMeta('分析时间计划', '<button class="button-secondary" type="button" data-task-action="schedule-open" data-task-key="' + utils.escapeAttribute(algorithm.key) + '">' + utils.escapeHtml(getTaskScheduleLabel(builder, config.scheduleKey)) + '</button>');
     return (
       '<div class="task-builder-body">' +
       '<div class="task-builder-meta">' +
       '<div class="task-builder-meta-grid">' +
       renderTaskBuilderMeta('算法版本', renderTaskVersionField(builder, algorithm, config)) +
-      renderTaskBuilderMeta('分析时间计划', '<button class="button-secondary" type="button" data-task-action="schedule-open" data-task-key="' + utils.escapeAttribute(algorithm.key) + '">' + utils.escapeHtml(getTaskScheduleLabel(builder, config.scheduleKey)) + '</button>') +
+      scheduleMeta +
       renderTaskBuilderMeta('分析周期', renderTaskIntervalField(builder, algorithm, config)) +
       renderTaskBuilderMeta('闲时分析', '<button class="task-switch' + (config.temporalEnabled ? ' on' : '') + '" type="button" data-task-action="temporal-toggle" data-task-key="' + utils.escapeAttribute(algorithm.key) + '"><span class="task-switch-handle"></span></button>') +
       '</div>' +
@@ -1084,11 +1166,20 @@
     );
   }
 
-  function renderTaskBuilderMeta(label, content) {
+  function renderTaskBuilderMeta(label, content, className) {
     return (
-      '<div class="task-builder-meta-item">' +
+      '<div class="task-builder-meta-item' + (className ? ' ' + className : '') + '">' +
       '<div class="task-builder-meta-label">' + utils.escapeHtml(label) + '</div>' +
       '<div class="task-builder-meta-value">' + content + '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderTaskScheduleInlineActions(builder, algorithm, config) {
+    return (
+      '<div class="task-schedule-inline-actions">' +
+      '<button class="task-schedule-inline-link" type="button" data-task-action="schedule-open" data-task-key="' + utils.escapeAttribute(algorithm.key) + '">' + utils.escapeHtml(getTaskScheduleLabel(builder, config.scheduleKey)) + '</button>' +
+      '<button class="task-schedule-inline-link" type="button" data-task-action="schedule-copy" data-task-key="' + utils.escapeAttribute(algorithm.key) + '">复制至其他算法</button>' +
       '</div>'
     );
   }
@@ -1341,6 +1432,11 @@
     }
 
     const builder = page.taskBuilder || {};
+    const activePlan = findTaskBuilderItem(builder.schedulePlans, state.scheduleModal.planKey);
+    const activePlanLabel = (activePlan && activePlan.label) || "";
+    const lockedNote = activePlan && activePlan.locked
+      ? (activePlan.hint || "默认模板，不允许修改。")
+      : (activePlan && activePlan.hint) || "自定义模板可用于后续算法时间时长复用。";
     return (
       '<div class="source-modal-layer open">' +
       '<button class="source-modal-mask" type="button" data-task-modal-close="schedule" aria-label="关闭时间计划弹框"></button>' +
@@ -1348,12 +1444,23 @@
       '<div class="source-modal-header"><h3 class="source-modal-title">选择时间计划</h3><button class="source-modal-close" type="button" aria-label="关闭" data-task-modal-close="schedule">×</button></div>' +
       '<div class="task-schedule-layout">' +
       '<aside class="task-schedule-sidebar">' +
+      '<div class="task-schedule-sidebar-toolbar">' +
+      '<button class="task-schedule-sidebar-link" type="button" data-task-action="schedule-plan-new">+ 新建</button>' +
+      '<button class="task-schedule-sidebar-link' + (activePlan && activePlan.locked ? ' disabled' : '') + '" type="button" data-task-action="schedule-plan-delete"' + (activePlan && activePlan.locked ? ' disabled' : '') + '>删除</button>' +
+      "</div>" +
+      '<div class="task-schedule-sidebar-list">' +
       ensureList(builder.schedulePlans).map(function (item) {
         return '<button class="task-schedule-item' + (item.key === state.scheduleModal.planKey ? " active" : "") + '" type="button" data-task-schedule-plan="' + utils.escapeAttribute(item.key) + '">' + utils.escapeHtml(item.label) + "</button>";
       }).join("") +
+      "</div>" +
       "</aside>" +
       '<section class="task-schedule-main">' +
-      renderTaskScheduleTimeline(findTaskBuilderItem(builder.schedulePlans, state.scheduleModal.planKey)) +
+      '<div class="task-schedule-note">' + utils.escapeHtml(lockedNote) + "</div>" +
+      '<div class="task-schedule-form">' +
+      '<div class="task-schedule-form-label">巡检计划名称</div>' +
+      '<input class="source-form-control task-schedule-name-input" type="text" data-task-schedule-field="label" value="' + utils.escapeAttribute(activePlanLabel) + '"' + (activePlan && activePlan.locked ? " readonly" : "") + ' />' +
+      "</div>" +
+      renderTaskScheduleTimeline(activePlan) +
       "</section>" +
       "</div>" +
       '<div class="source-modal-footer"><button class="button" type="button" data-task-schedule-save="true">确定</button><button class="button-secondary" type="button" data-task-modal-close="schedule">取消</button></div>' +
@@ -1366,27 +1473,36 @@
     const rows = ensureList((plan && plan.weekly) || []);
     const hours = [];
     let hour = 0;
-    for (hour = 0; hour <= 24; hour += 2) {
-      hours.push('<span>' + String(hour).padStart(2, "0") + "</span>");
+    for (hour = 0; hour < 24; hour += 1) {
+      hours.push('<span class="task-schedule-hour-cell">' + (hour % 2 === 0 ? String(hour).padStart(2, "0") : "") + "</span>");
     }
 
     return (
       '<div class="task-schedule-grid">' +
-      '<div class="task-schedule-hours">' + hours.join("") + "</div>" +
-      rows.map(function (row) {
+      '<div class="task-schedule-hours"><span class="task-schedule-hours-spacer"></span>' + hours.join("") + "</div>" +
+      rows.map(function (row, dayIndex) {
         return (
           '<div class="task-schedule-row">' +
           '<div class="task-schedule-day">' + utils.escapeHtml(row.day) + "</div>" +
-          '<div class="task-schedule-track">' +
-          ensureList(row.ranges).map(function (range) {
-            return '<span class="task-schedule-block" style="left:' + utils.escapeAttribute(String(range.start / 24 * 100)) + "%;width:" + utils.escapeAttribute(String((range.end - range.start) / 24 * 100)) + '%;"></span>';
-          }).join("") +
+          '<div class="task-schedule-cells">' +
+          renderTaskScheduleCells(row, dayIndex, !!(plan && plan.locked)) +
           "</div>" +
           "</div>"
         );
       }).join("") +
       "</div>"
     );
+  }
+
+  function renderTaskScheduleCells(row, dayIndex, disabled) {
+    const activeHours = buildTaskScheduleHourMap(row);
+    const cells = [];
+    for (let hour = 0; hour < 24; hour += 1) {
+      cells.push(
+        '<button class="task-schedule-cell' + (activeHours[hour] ? ' active' : '') + '" type="button" data-task-schedule-cell="true" data-task-day-index="' + utils.escapeAttribute(String(dayIndex)) + '" data-task-hour="' + utils.escapeAttribute(String(hour)) + '"' + (disabled ? ' disabled' : '') + ' aria-label="' + utils.escapeAttribute((row.day || '') + ' ' + String(hour).padStart(2, "0") + ':00') + '"></button>'
+      );
+    }
+    return cells.join("");
   }
 
   function renderTaskPointPickerModal(page, state) {
@@ -1945,6 +2061,94 @@
   function getTaskScheduleLabel(builder, scheduleKey) {
     const schedule = findTaskBuilderItem(builder.schedulePlans, scheduleKey);
     return schedule ? schedule.label : getDefaultTaskSchedule(builder);
+  }
+
+  function createTaskSchedulePlan(schedulePlans, sourcePlan) {
+    const plans = ensureList(schedulePlans);
+    const index = plans.filter(function (item) {
+      return !item.locked;
+    }).length + 1;
+    return {
+      key: "custom-schedule-" + Date.now(),
+      label: "自定义计划" + index,
+      locked: false,
+      hint: "自定义模板可编辑，点击时间轴即可勾选或取消时段。",
+      weekly: cloneTaskScheduleWeekly(sourcePlan && sourcePlan.weekly)
+    };
+  }
+
+  function cloneTaskScheduleWeekly(weekly) {
+    const rows = ensureList(weekly);
+    if (!rows.length) {
+      return ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"].map(function (day) {
+        return { day: day, ranges: [] };
+      });
+    }
+
+    return rows.map(function (row) {
+      return {
+        day: row.day || "",
+        ranges: ensureList(row.ranges).map(function (range) {
+          return {
+            start: Number(range.start) || 0,
+            end: Number(range.end) || 0
+          };
+        })
+      };
+    });
+  }
+
+  function buildTaskScheduleHourMap(row) {
+    const activeHours = {};
+    ensureList((row && row.ranges) || []).forEach(function (range) {
+      const start = Math.max(0, Math.min(24, Number(range.start) || 0));
+      const end = Math.max(start, Math.min(24, Number(range.end) || 0));
+      for (let hour = start; hour < end; hour += 1) {
+        activeHours[hour] = true;
+      }
+    });
+    return activeHours;
+  }
+
+  function toggleTaskScheduleHour(plan, dayIndex, hour) {
+    const rows = ensureList(plan && plan.weekly);
+    const row = rows[dayIndex];
+    if (!row) {
+      return;
+    }
+
+    const hourMap = buildTaskScheduleHourMap(row);
+    if (hourMap[hour]) {
+      delete hourMap[hour];
+    } else {
+      hourMap[hour] = true;
+    }
+
+    row.ranges = compactTaskScheduleHourMap(hourMap);
+  }
+
+  function compactTaskScheduleHourMap(hourMap) {
+    const ranges = [];
+    let rangeStart = null;
+    for (let hour = 0; hour <= 24; hour += 1) {
+      const active = hour < 24 && !!hourMap[hour];
+      if (active && rangeStart === null) {
+        rangeStart = hour;
+      }
+      if (!active && rangeStart !== null) {
+        ranges.push({ start: rangeStart, end: hour });
+        rangeStart = null;
+      }
+    }
+    return ranges;
+  }
+
+  function isImageTaskPage(page) {
+    if (!page) {
+      return false;
+    }
+
+    return page.taskType === "image" || page.key === "image-task-create" || page.listPageKey === "image-analysis";
   }
 
   function getTaskAlgorithmConfig(page, algorithmKey) {
