@@ -77,6 +77,17 @@
       ]
     },
     {
+      "key": "event-group",
+      "label": "事件中心",
+      "icon": "目录",
+      "children": [
+        {
+          "key": "event-list",
+          "label": "事件列表"
+        }
+      ]
+    },
+    {
       "key": "system-group",
       "label": "系统管理",
       "icon": "目录",
@@ -182,6 +193,11 @@
       "key": "platform-config",
       "file": "platform-config.html",
       "source": "../assets/js/pages/platform-config.page.js"
+    },
+    "event-list": {
+      "key": "event-list",
+      "file": "event-list.html",
+      "source": "../assets/js/pages/event-list.page.js"
     },
     "spec-management": {
       "key": "spec-management",

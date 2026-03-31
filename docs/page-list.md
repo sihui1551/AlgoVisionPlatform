@@ -8,6 +8,7 @@
 | `algorithm-management` | 算法管理 | `pages/algorithm-management.html` | `assets/js/pages/algorithm-management.page.js` | `assets/css/pages/algorithm-management.css` |
 | `cloud-record` | 云端录像 | `pages/cloud-record.html` | `assets/js/pages/cloud-record.page.js` | `assets/css/pages/cloud-record.css` |
 | `dashboard` | 仪表盘 | `pages/dashboard.html` | `assets/js/pages/dashboard.page.js` | `assets/css/pages/dashboard.css` |
+| `event-list` | 事件列表 | `pages/event-list.html` | `assets/js/pages/event-list.page.js` | `assets/css/pages/event-list.css` |
 | `gb-channel-edit` | 编辑通道 | `pages/gb-channel-edit.html` | `assets/js/pages/gb-channel-form.page.js` | `assets/css/pages/gb-channel-form.css` |
 | `gb-channel-list` | 通道列表 | `pages/gb-channel-list.html` | `assets/js/pages/gb-channel-list.page.js` | `assets/css/pages/gb-channel-list.css` |
 | `gb-device-create` | 新增设备 | `pages/gb-device-create.html` | `assets/js/pages/gb-device-form.page.js` | `assets/css/pages/gb-device-form.css` |
