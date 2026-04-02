@@ -1,7 +1,30 @@
 # AlgoVision Platform Prototype
 
-静态多页面原型仓库，用于演示 AI 视频算法调度平台的主要业务页面与交互流程。
-页面入口、脚本、样式和构建流程都收敛在统一目录中，默认分支为 `main`。
+AlgoVision Platform Prototype 是一个面向 AI 视频算法调度场景的静态多页面原型项目，用来展示平台首页、接入管理、算法管理、任务管理、事件中心与系统配置等核心产品能力。
+
+这个仓库的目标不是承载真实后端业务，而是提供一套结构清晰、可直接预览、方便持续迭代的产品原型，帮助产品、设计、研发和交付团队在同一套页面语言下协作。
+
+## 产品概览
+
+当前原型覆盖的平台能力包括：
+
+- 仪表盘：展示设备、算法、任务分类、接入方式和告警趋势等全局视图。
+- 接入管理：覆盖接入源、本地视频、云端录像、拉流代理等入口配置。
+- 算法与任务：展示算法仓库、视频流分析、图片分析、离线分析及任务创建流程。
+- 事件中心：聚焦事件列表及后续联动能力。
+- 系统管理：提供规格管理、平台配置等基础后台页面。
+
+完整页面映射见 [docs/page-list.md](docs/page-list.md)。
+
+## 适用场景
+
+这个项目适合用于以下场景：
+
+- 产品方案评审和业务流程演示
+- 设计稿落地前的交互验证
+- 前后端联调前的页面结构对齐
+- 交付阶段的原型展示与说明
+- 后续正式项目开发前的页面骨架复用
 
 ## 项目结构
 
@@ -22,21 +45,21 @@
 `-- .gitattributes
 ```
 
-目录约定如下：
+目录职责如下：
 
 - `index.html`：站点入口页。
-- `pages/*.html`：每个业务页面的实际访问入口。
-- `assets/js/config/`：全局配置与页面注册表。
-- `assets/js/core/`：运行时框架、通用组件和 mock 能力。
-- `assets/js/pages/*.page.js`：页面定义、文案和页面特有交互。
+- `pages/*.html`：页面访问入口。
+- `assets/js/config/`：产品配置、导航和页面注册。
+- `assets/js/core/`：原型运行时、通用组件和 mock 能力。
+- `assets/js/pages/*.page.js`：页面定义、页面数据和特有交互。
 - `assets/css/pages/*.css`：页面局部样式。
-- `docs/`：项目规则、页面清单和变更记录。
-- `tools/`：页面壳同步与构建脚本。
+- `docs/`：规则说明、页面清单、视觉规范与变更记录。
+- `tools/`：页面壳同步和构建脚本。
 - `public/`：构建产物目录。
 
 ## 当前页面
 
-当前仓库包含以下原型页面：
+当前仓库已包含以下页面：
 
 - 仪表盘
 - 接入源管理
@@ -56,25 +79,23 @@
 - 拉流代理创建 / 编辑
 - 视频流任务创建
 
-完整映射关系见 [docs/page-list.md](docs/page-list.md)。
-
 ## 本地预览
 
-可以直接在浏览器中打开：
+可以直接在浏览器中打开以下文件进行预览：
 
 - `index.html`
 - `pages/dashboard.html`
 
-如果需要更接近线上访问方式，也可以在仓库根目录启一个静态服务器。
+如果需要更稳定的访问方式，建议在仓库根目录启动一个静态文件服务后再浏览。
 
-## 开发流程
+## 开发方式
 
-页面开发的基本路径是：
+页面开发遵循统一的页面注册和页面壳同步流程：
 
-1. 在 `assets/js/config/prototype.config.js` 中补充或更新页面注册信息。
-2. 编写 `assets/js/pages/<page>.page.js` 页面定义。
-3. 编写 `assets/css/pages/<page>.css` 页面样式。
-4. 运行页面壳同步脚本，刷新 `pages/*.html` 与页面清单。
+1. 在 `assets/js/config/prototype.config.js` 中补充或调整页面注册信息。
+2. 在 `assets/js/pages/` 中编写对应页面脚本。
+3. 在 `assets/css/pages/` 中编写对应页面样式。
+4. 运行页面同步脚本，刷新 `pages/*.html` 与页面清单。
 
 同步命令：
 
@@ -82,13 +103,13 @@
 node .\tools\generate-ai-pages.js
 ```
 
-这个脚本会：
+这个脚本会完成以下工作：
 
-- 根据 `pageRegistry` 同步生成 `pages/*.html`
+- 根据 `pageRegistry` 同步生成页面入口壳
 - 校验页面脚本和样式入口是否存在
 - 更新 [docs/page-list.md](docs/page-list.md)
 
-## 构建发布
+## 构建方式
 
 构建命令：
 
@@ -96,21 +117,21 @@ node .\tools\generate-ai-pages.js
 node .\tools\build-pages.js
 ```
 
-构建流程会：
+构建流程包括：
 
-1. 先执行 `tools/generate-ai-pages.js`
+1. 执行 `tools/generate-ai-pages.js`
 2. 重建 `public/`
 3. 复制 `index.html`、`pages/`、`assets/`、`docs/` 到 `public/`
 4. 校验关键页面和资源是否存在
 
-仓库保留了 `.gitlab-ci.yml`，当前 CI 会直接调用这套构建脚本并发布 `public/`。
+仓库中的 `.gitlab-ci.yml` 会直接复用这套构建流程来发布 `public/`。
 
-## 维护说明
+## 维护约定
 
-- 页面 HTML 壳不要手工长期维护，优先通过 `generate-ai-pages.js` 回写。
-- 页面资源路径统一使用相对路径，避免部署到子路径时失效。
-- 文本类文件的行尾规则由 [.gitattributes](.gitattributes) 统一约束，减少 Windows 环境下的伪修改。
-- `public/` 是构建产物目录；如果源码有变更，重新构建后再同步产物。
+- 页面 HTML 壳优先通过脚本同步，不建议长期手工维护。
+- 页面资源统一使用相对路径，确保构建产物在子路径环境下也能正常访问。
+- 文本文件行尾由 [.gitattributes](.gitattributes) 统一约束，减少 Windows 环境下的伪修改。
+- `public/` 是构建结果，不是主要维护入口；源码有变更后应重新构建。
 
 ## 相关文档
 
@@ -121,7 +142,7 @@ node .\tools\build-pages.js
 
 ## 当前状态
 
-- 默认分支已经切换为 `main`
-- 当前仓库以 `main` 为主线维护
-- 仓库已加入 `.gitattributes`，用于稳定文本文件行尾
-- 仪表盘的告警统计已经支持按 `今日`、`本月`、`本年`、`自定日期范围` 切换
+- 默认分支为 `main`
+- 仓库当前以主线分支持续维护
+- 仪表盘告警统计已支持按 `今日`、`本月`、`本年`、`自定日期范围` 切换
+- 项目已加入 `.gitattributes` 以稳定文本文件行尾
