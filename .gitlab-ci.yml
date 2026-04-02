@@ -1,16 +1,40 @@
-image: node:20-alpine
-
 stages:
   - deploy
 
-deploy-pages:
+default:
+  tags:
+    - prd-runner
+
+variables:
+  GIT_DEPTH: "0"
+  DEPLOY_ROOT: /home/gitlab-runner/prototype
+  PROJECT_PATH: ${DEPLOY_ROOT}/${CI_PROJECT_NAME}
+
+deploy_latest:
   stage: deploy
   script:
-    - node ./tools/build-pages.js
-  pages:
-    publish: public
+    - rm -rf "${PROJECT_PATH}/latest"
+    - mkdir -p "${PROJECT_PATH}/latest"
+    - cp -r index.html "${PROJECT_PATH}/latest/"
+    - '[ -d pages ] && cp -r pages "${PROJECT_PATH}/latest/" || true'
+    - '[ -d assets ] && cp -r assets "${PROJECT_PATH}/latest/" || true'
+    - '[ -d docs ] && cp -r docs "${PROJECT_PATH}/latest/" || true'
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  environment:
-    name: production
-    url: $CI_PAGES_URL
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+deploy_release:
+  stage: deploy
+  script:
+    - mkdir -p "${PROJECT_PATH}/releases"
+    - |
+      if [ -d "${PROJECT_PATH}/releases/${CI_COMMIT_TAG}" ]; then
+        echo "Release already exists: ${PROJECT_PATH}/releases/${CI_COMMIT_TAG}"
+        exit 1
+      fi
+    - mkdir -p "${PROJECT_PATH}/releases/${CI_COMMIT_TAG}"
+    - cp -r index.html "${PROJECT_PATH}/releases/${CI_COMMIT_TAG}/"
+    - '[ -d pages ] && cp -r pages "${PROJECT_PATH}/releases/${CI_COMMIT_TAG}/" || true'
+    - '[ -d assets ] && cp -r assets "${PROJECT_PATH}/releases/${CI_COMMIT_TAG}/" || true'
+    - '[ -d docs ] && cp -r docs "${PROJECT_PATH}/releases/${CI_COMMIT_TAG}/" || true'
+  rules:
+    - if: '$CI_COMMIT_TAG'
