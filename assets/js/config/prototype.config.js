@@ -33,7 +33,7 @@
         },
         {
           "label": "阅读原型规范",
-          "href": "./docs/prototype-rules.md",
+          "href": "./docs/preview.html?file=prototype-rules.md&title=%E5%8E%9F%E5%9E%8B%E8%A7%84%E5%88%99",
           "variant": "ghost"
         }
       ]
@@ -102,26 +102,19 @@
       {
         "key": "docs",
         "title": "文档资料入口",
-        "description": "集中进入规则、页面清单、变更记录以及后续会持续补充的说明类页面。",
+        "description": "集中进入规则、页面清单以及后续会持续补充的说明类页面。",
         "items": [
           {
             "label": "原型规则",
             "description": "查看项目架构、目录规范、页面类型和需求说明抽屉规则。",
-            "href": "./docs/prototype-rules.md",
+            "href": "./docs/preview.html?file=prototype-rules.md&title=%E5%8E%9F%E5%9E%8B%E8%A7%84%E5%88%99",
             "kind": "文档",
             "status": "ready"
           },
           {
             "label": "页面清单",
             "description": "查看页面入口、脚本与样式映射，便于研发对照实现。",
-            "href": "./docs/page-list.md",
-            "kind": "文档",
-            "status": "ready"
-          },
-          {
-            "label": "变更记录",
-            "description": "查看原型阶段的关键结构调整与阶段性改动说明。",
-            "href": "./docs/change-log.md",
+            "href": "./docs/preview.html?file=page-list.md&title=%E9%A1%B5%E9%9D%A2%E6%B8%85%E5%8D%95",
             "kind": "文档",
             "status": "ready"
           },
@@ -153,7 +146,7 @@
         "items": [
           {
             "label": "原型规则",
-            "href": "./docs/prototype-rules.md"
+            "href": "./docs/preview.html?file=prototype-rules.md&title=%E5%8E%9F%E5%9E%8B%E8%A7%84%E5%88%99"
           },
           {
             "label": "视频流分析",
@@ -171,7 +164,7 @@
         "items": [
           {
             "label": "页面清单",
-            "href": "./docs/page-list.md"
+            "href": "./docs/preview.html?file=page-list.md&title=%E9%A1%B5%E9%9D%A2%E6%B8%85%E5%8D%95"
           },
           {
             "label": "接入源管理",
@@ -191,10 +184,6 @@
         "role": "测试",
         "summary": "优先看入口链路、页面规则和最近改动。",
         "items": [
-          {
-            "label": "变更记录",
-            "href": "./docs/change-log.md"
-          },
           {
             "label": "仪表盘",
             "route": "dashboard"

@@ -5,7 +5,7 @@
   const app = config.app || {};
   const root = document.getElementById("portal-root");
   const sections = ensureList(portal.sections);
-  let activeSectionKey = sections[0] && sections[0].key ? sections[0].key : "";
+  let activeSectionKey = resolveInitialSectionKey();
 
   if (!root) {
     return;
@@ -118,6 +118,7 @@
       }
 
       activeSectionKey = key;
+      syncSectionHash(key);
       renderPage();
     });
   }
@@ -137,6 +138,28 @@
     return sections.find(function (section) {
       return section.key === activeSectionKey;
     }) || sections[0] || null;
+  }
+
+  function resolveInitialSectionKey() {
+    const hashKey = String((window.location.hash || "").replace(/^#/, "")).trim();
+    const matched = sections.find(function (section) {
+      return section.key === hashKey;
+    });
+
+    if (matched) {
+      return matched.key;
+    }
+
+    return sections[0] && sections[0].key ? sections[0].key : "";
+  }
+
+  function syncSectionHash(key) {
+    if (!key || !window.history || typeof window.history.replaceState !== "function") {
+      return;
+    }
+
+    const nextUrl = window.location.pathname + window.location.search + "#" + encodeURIComponent(key);
+    window.history.replaceState(null, "", nextUrl);
   }
 
   function resolveHref(item) {

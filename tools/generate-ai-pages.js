@@ -8,6 +8,7 @@ const configPath = process.env.CFG
   ? path.resolve(process.cwd(), process.env.CFG)
   : path.join(projectRoot, "assets", "js", "config", "prototype.config.js");
 const docsPageListPath = path.join(projectRoot, "docs", "page-list.md");
+const docsConfigPath = path.join(projectRoot, "assets", "js", "config", "docs.config.js");
 
 const runtimeScripts = [
   "../assets/js/config/prototype.config.js",
@@ -64,10 +65,12 @@ function main() {
   });
 
   writeText(docsPageListPath, buildPageListMarkdown(summaryRows));
+  writeText(docsConfigPath, buildDocsConfigScript());
 
   const outputLines = [
     "Synced page shells: " + summaryRows.length,
-    "Updated doc: " + normalizePath(path.relative(projectRoot, docsPageListPath))
+    "Updated doc: " + normalizePath(path.relative(projectRoot, docsPageListPath)),
+    "Updated doc data: " + normalizePath(path.relative(projectRoot, docsConfigPath))
   ];
 
   if (warnings.length) {
@@ -278,6 +281,40 @@ function buildPageListMarkdown(rows) {
   lines.push("");
 
   return lines.join("\n");
+}
+
+function buildDocsConfigScript() {
+  const docsRoot = path.join(projectRoot, "docs");
+  const docMap = {};
+
+  fs.readdirSync(docsRoot)
+    .filter(function (fileName) {
+      return fileName.toLowerCase().endsWith(".md");
+    })
+    .sort(function (left, right) {
+      return left.localeCompare(right);
+    })
+    .forEach(function (fileName) {
+      const content = fs.readFileSync(path.join(docsRoot, fileName), "utf8");
+      docMap[fileName] = {
+        title: deriveDocTitle(fileName, content),
+        content: content
+      };
+    });
+
+  return [
+    "window.PROTOTYPE_DOCS = " + JSON.stringify(docMap, null, 2) + ";",
+    ""
+  ].join("\n");
+}
+
+function deriveDocTitle(fileName, content) {
+  const match = String(content || "").match(/^#\s+(.+)$/m);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+
+  return fileName.replace(/\.md$/i, "");
 }
 
 function writeText(filePath, content) {

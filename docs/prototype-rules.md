@@ -136,7 +136,6 @@
 - `prototype-rules.md`：架构和开发规则
 - `style-guide.md`：视觉规范
 - `page-list.md`：页面入口与资源映射
-- `change-log.md`：变更记录
 
 如果文档与代码冲突，以代码为准并更新文档。
 

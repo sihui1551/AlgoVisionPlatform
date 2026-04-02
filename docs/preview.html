@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文档预览</title>
+    <link href="../assets/css/prototype.css" type="text/css" rel="stylesheet" />
+    <link href="../assets/css/pages/docs-preview.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+    <main class="doc-preview">
+      <div class="doc-preview__shell">
+        <header class="doc-preview__topbar">
+          <div class="doc-preview__brand">
+            <a class="doc-preview__home" href="../index.html">回到首页</a>
+            <button class="doc-preview__back" type="button" onclick="history.back()">返回上一页</button>
+          </div>
+          <div class="doc-preview__meta">
+            <span class="doc-preview__chip">Markdown 预览</span>
+          </div>
+        </header>
+        <section class="doc-preview__hero">
+          <p class="doc-preview__eyebrow">Docs Preview</p>
+          <h1 class="doc-preview__title" id="doc-preview-title">文档预览</h1>
+          <p class="doc-preview__path" id="doc-preview-path">docs/</p>
+        </section>
+        <article class="doc-preview__article">
+          <div class="doc-preview__content markdown-body" id="doc-preview-content">
+            <p class="doc-preview__loading">正在加载文档...</p>
+          </div>
+        </article>
+      </div>
+    </main>
+    <script src="../assets/js/config/docs.config.js"></script>
+    <script src="../assets/js/docs.preview.js"></script>
+  </body>
+</html>
