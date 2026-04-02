@@ -221,7 +221,12 @@
       return "";
     }
 
-    return '<button class="floating-doc-button" type="button" data-shell-toggle="doc-open">' + "\u9700\u6c42\u8bf4\u660e" + "</button>";
+    return (
+      '<div class="floating-doc-actions">' +
+      '<a class="floating-doc-button floating-home-button" href="../index.html">' + "\u56de\u5230\u9996\u9875" + "</a>" +
+      '<button class="floating-doc-button" type="button" data-shell-toggle="doc-open">' + "\u9700\u6c42\u8bf4\u660e" + "</button>" +
+      "</div>"
+    );
   }
 
   function renderDocDrawer(page) {
