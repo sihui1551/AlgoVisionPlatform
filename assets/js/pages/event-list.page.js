@@ -2,12 +2,12 @@
   const utils = window.PROTOTYPE_UTILS;
 
   const PLACEHOLDER = "../assets/images/image-preview-placeholder.svg";
-  const DETAIL_MAIN_A = "../images/177366061970.png";
-  const DETAIL_MAIN_B = "../images/17738165977198.png";
-  const DETAIL_THUMB_A = "../images/17738166288312.png";
-  const DETAIL_THUMB_B = "../images/17738166555824.png";
-  const DETAIL_THUMB_C = "../images/17738166707852.png";
-  const DETAIL_MAP = "../images/17738166915508.png";
+  const DETAIL_MAIN_A = "../assets/images/177366061970.png";
+  const DETAIL_MAIN_B = "../assets/images/17738165977198.png";
+  const DETAIL_THUMB_A = "../assets/images/17738166288312.png";
+  const DETAIL_THUMB_B = "../assets/images/17738166555824.png";
+  const DETAIL_THUMB_C = "../assets/images/17738166707852.png";
+  const DETAIL_MAP = "../assets/images/17738166915508.png";
 
   const GALLERY_STREAM = [DETAIL_MAIN_A, DETAIL_MAIN_B, DETAIL_THUMB_A, DETAIL_THUMB_B, DETAIL_THUMB_C];
   const GALLERY_IMAGE = [DETAIL_MAIN_B, DETAIL_MAIN_A, DETAIL_THUMB_A, DETAIL_THUMB_B, DETAIL_THUMB_C];
