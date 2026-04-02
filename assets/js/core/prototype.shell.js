@@ -244,13 +244,10 @@
         ? '<p class="doc-drawer-summary">' + utils.escapeHtml(doc.summary) + "</p>"
         : "") +
       '<div class="doc-drawer-body">' +
-      renderDocBlock("\u9875\u9762\u76ee\u6807", doc.goal ? [doc.goal] : []) +
-      renderDocBlock("\u529f\u80fd\u6a21\u5757", doc.modules) +
-      renderDocFields(doc.fields) +
-      renderDocBlock("\u4e1a\u52a1\u89c4\u5219", doc.rules) +
-      renderDocBlock("\u4ea4\u4e92\u8bf4\u660e", doc.interactions) +
-      renderDocBlock("\u5f02\u5e38\u60c5\u51b5", doc.exceptions) +
-      renderDocBlock("\u5f85\u786e\u8ba4\u9879", doc.pending) +
+      renderDocBlock("\u9875\u9762\u76ee\u7684", doc.goal ? [doc.goal] : []) +
+      renderDocBlock("\u6838\u5fc3\u5185\u5bb9", doc.modules) +
+      renderDocBlock("\u5b9e\u73b0\u8981\u70b9", doc.rules) +
+      renderDocBlock("\u9a8c\u6536\u53e3\u5f84", doc.interactions) +
       "</div>" +
       "</aside>"
     );
@@ -285,15 +282,16 @@
 
     return {
       title: page.heading + "需求说明",
-      summary: page.subtitle || "当前页面用于原型演示和业务流程说明。",
-      goal: "帮助产品、设计和研发快速理解“" + page.heading + "”页面的原型结构与交互入口。",
-      modules: modules.length ? modules : ["页面主体内容", "关键操作入口", "原型演示反馈"],
+      summary: page.subtitle || "用于快速理解当前原型页的目的、范围和实现落点。",
+      goal: "供研发、设计和测试快速理解“" + page.heading + "”页面的业务目的与原型范围。",
+      modules: modules.length ? modules : ["页面主体内容", "关键操作入口", "主要状态展示"],
       rules: [
         "当前页面以原型演示为主，不直接对接真实后端服务。",
-        "页面中的按钮和链接优先表达业务意图与流程走向。"
+        "页面中的按钮、链接和弹窗优先表达业务意图与流程走向。"
       ],
-      pending: [
-        "如需更完整的产品说明，可在对应页面定义中补充 `productDoc`。"
+      interactions: [
+        "关键入口应能正确触发对应页面跳转、弹窗或反馈。",
+        "页面中的状态、筛选和列表结果应保持一致。"
       ]
     };
   }
@@ -306,9 +304,9 @@
     return (
       '<section class="doc-block">' +
       '<h4 class="doc-block-title">' + utils.escapeHtml(title) + "</h4>" +
-      '<div class="doc-block-list">' +
+      '<div class="doc-block-card">' +
       items.map(function (item) {
-        return '<div class="doc-list-item">' + utils.escapeHtml(item) + "</div>";
+        return '<div class="doc-list-row">' + utils.escapeHtml(item) + "</div>";
       }).join("") +
       "</div>" +
       "</section>"

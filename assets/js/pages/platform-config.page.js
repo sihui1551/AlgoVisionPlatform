@@ -10,6 +10,26 @@
     heading: "平台配置",
     subtitle: "配置算法训练平台连接信息。",
     breadcrumbTrail: ["系统管理"],
+    productDoc: {
+      title: "平台配置需求说明",
+      summary: "面向研发、设计、测试说明算法训练平台配置页的原型范围。",
+      goal: "供平台管理员维护算法训练平台连接信息，为算法仓库同步和模型接入提供基础配置。",
+      modules: [
+        "表单主体用于录入平台地址、AppKey 和 AppSecret 等连接参数。",
+        "页面头部用于说明当前配置场景与配置用途。",
+        "底部保存按钮用于提交配置并回写本地存储。"
+      ],
+      rules: [
+        "平台地址、AppKey 和 AppSecret 为保存前的必填项。",
+        "当前页面以连接参数维护为主，不承载真实连通性校验流程。",
+        "保存成功后需要写入本地存储，并根据回跳标记返回来源页面。"
+      ],
+      interactions: [
+        "未完整填写信息时，点击保存需要阻止提交并提示。",
+        "保存成功后，需要展示成功反馈并写入配置结果。",
+        "存在回跳路由时，保存后需要返回来源页面。"
+      ]
+    },
     renderDashboardPage: function (context) {
       return renderPlatformConfigPage(context.page);
     },

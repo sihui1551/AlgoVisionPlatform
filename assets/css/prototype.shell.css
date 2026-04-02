@@ -612,21 +612,42 @@
   font-weight: 700;
 }
 
-.doc-block-list,
+.doc-block-card,
 .doc-field-list {
-  display: grid;
-  gap: 10px;
+  border: 1px solid #e8edf4;
+  border-radius: 12px;
+  background: #f8fafc;
 }
 
-.doc-list-item,
 .doc-field-item {
   padding: 12px 14px;
-  border: 1px solid #e8edf4;
-  border-radius: 10px;
-  background: #f8fafc;
   color: #4d6075;
   font-size: 13px;
   line-height: 1.7;
+}
+
+.doc-list-row {
+  position: relative;
+  padding: 12px 14px 12px 28px;
+  color: #4d6075;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.doc-list-row + .doc-list-row,
+.doc-field-item + .doc-field-item {
+  border-top: 1px solid #e8edf4;
+}
+
+.doc-list-row::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 21px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #94a3b8;
 }
 
 .doc-field-label {
