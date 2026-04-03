@@ -2,7 +2,7 @@
   "app": {
     "eyebrow": "演示框架",
     "brandMark": "AI",
-    "name": "AI视频算法调度平台",
+    "name": "AI视频平台",
     "subtitle": "多模型视频生产与调度原型",
     "navSectionTitle": "",
     "footerItems": [
@@ -13,7 +13,7 @@
   "portal": {
     "hero": {
       "eyebrow": "Prototype Portal",
-      "title": "AI视频算法调度平台项目总入口",
+      "title": "AI视频平台项目总入口",
       "summary": "统一进入业务原型、需求资料、架构图与流程说明。首页既是项目门户，也是产品、研发、测试协作时共享的总索引。",
       "highlights": [
         "业务页面与文档资料共用一套入口",
